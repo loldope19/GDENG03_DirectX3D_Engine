@@ -136,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DX3D\Source\DX3D\Core\EngineTime.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Game\Camera.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\AnimatedRectangle.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Cube.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\DeviceContext.cpp" />
@@ -146,6 +147,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Game\Win32\Win32Game.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Plane.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Shader.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Triangle.cpp" />
     <ClCompile Include="Game\main.cpp" />
@@ -158,8 +160,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\EngineTime.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Game\Camera.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\AnimatedRectangle.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Cube.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Graphics\Plane.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Shader.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Triangle.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Matrix4x4.h" />

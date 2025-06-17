@@ -15,6 +15,8 @@ namespace dx3d {
 	class Display;
 
 	class DeviceContext;
+	class Camera;
+	class Plane;
 
 	class ShaderBinary;
 	class GraphicsPipelineState;

@@ -5,6 +5,8 @@
 #include <DX3D/Graphics/Rectangle.h>
 #include <DX3D/Graphics/Cube.h>
 #include <DX3D/Graphics/AnimatedRectangle.h>
+#include <DX3D/Graphics/Plane.h>
+#include <DX3D/Game/Camera.h>
 #include <DX3D/Math/Vec4.h>
 #include <DX3D/Math/Matrix4x4.h>
 #include <array>
@@ -46,15 +48,22 @@ namespace dx3d
         static void toggleRotation();
         static bool isRotationEnabled();
 
+        void createPlane(const Vec3& position, const Vec3& scale, const Vec4& color);
+        void onUpdate(float dt, bool moveForward, bool moveBackward, bool moveLeft, bool moveRight, float deltaX, float deltaY);
+
+
     private:
         std::shared_ptr<GraphicsDevice> m_graphicsDevice{};
         DeviceContextPtr m_deviceContext{};
         GraphicsPipelineStatePtr m_pipeline{};
+        Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullNone{};
 
         std::unique_ptr<Triangle> m_triangleManager{};
         std::unique_ptr<Rectangle> m_rectangleManager{};
         std::vector<std::unique_ptr<Cube>> m_cubes;
         std::unique_ptr<AnimatedRectangle> m_animatedRectangleManager{};
+        std::vector<std::unique_ptr<Plane>> m_planes;
+        std::unique_ptr<Camera> m_camera;
 
         static bool s_rotationEnabled;
 

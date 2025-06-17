@@ -22,6 +22,21 @@ GraphicsEngine::GraphicsEngine(const GraphicsEngineDesc& desc) : Base(desc.base)
     auto& device = *m_graphicsDevice;
     m_deviceContext = device.createDeviceContext();
 
+    D3D11_RASTERIZER_DESC rasterizerDesc = {};
+    rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+    rasterizerDesc.CullMode = D3D11_CULL_NONE;
+    rasterizerDesc.FrontCounterClockwise = FALSE;
+    rasterizerDesc.DepthBias = 0;
+    rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+    rasterizerDesc.DepthBiasClamp = 0.0f;
+    rasterizerDesc.DepthClipEnable = TRUE;
+    rasterizerDesc.ScissorEnable = FALSE;
+    rasterizerDesc.MultisampleEnable = FALSE;
+    rasterizerDesc.AntialiasedLineEnable = FALSE;
+
+    m_graphicsDevice->m_d3dDevice->CreateRasterizerState(&rasterizerDesc, &m_rasterizerStateCullNone);
+
+
     constexpr char shaderSourceCode[] =
         R"(
 void VSMain()
@@ -94,39 +109,18 @@ void PSMain()
 
     // addAnimatedRectangle(stateA_verts, stateB_verts);
 
-    srand(static_cast<unsigned int>(time(NULL)));
+    // Slide 30 - Depth Checking
+    // In the absence of an Engine UI, I'm rendering both primitives by code first
+    // Cube is rendered first
+    createCube({ 0.0f, 0.0f, 0.0f }, { 2.0f, 2.0f, 2.0f }, {0.0f, 0.0f, 1.0f}, 2.0f);
+    // Plane is rendered next
+    createPlane({ 0.0f, 0.0f, 0.0f }, { 10.0f, 1.0f, 10.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
 
-    const int numCubes = 100;
-    const float areaSize = 5.0f;
-
-    for (int i = 0; i < numCubes; ++i)
-    {
-        Vec3 pos;
-        pos.x = (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * areaSize;
-        pos.y = (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * areaSize;
-        pos.z = (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f) * 1.5f;
-
-        Vec3 axis(
-            static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f,
-            static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f,
-            static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f
-        );
-        axis.normalize();
-
-        const float speed = (static_cast<float>(rand()) / RAND_MAX) * 5.0f + 0.5f;
-
-        createCube(pos, { 1.0f, 1.0f, 1.0f }, axis, speed);
-    }
+    m_camera = std::make_unique<Camera>(Vec3{ 0.0f, 0.0f, -10.0f }, 10.0f, 15.0f);
 
     float width = 1280.0f;
     float height = 720.0f;
-    float aspectRatio = width / height;
-    float fov = 90.0f; // degrees
-    float nearPlane = 0.1f;
-    float farPlane = 1000.0f;
-    m_projectionMatrix = Matrix4x4::perspective(fov, aspectRatio, nearPlane, farPlane);
-
-    m_viewMatrix = Matrix4x4::lookAt({ 0.0f, 0.0f, -5.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+    m_projectionMatrix = Matrix4x4::perspective(90.0f, width / height, 0.1f, 1000.0f);
 }
 
 GraphicsEngine::~GraphicsEngine()
@@ -228,6 +222,31 @@ void dx3d::GraphicsEngine::addAnimatedRectangle(const std::array<VertexState, 4>
     }
 }
 
+void dx3d::GraphicsEngine::createPlane(const Vec3& position, const Vec3& scale, const Vec4& color)
+{
+    GraphicsResourceDesc gDesc = { {m_logger}, m_graphicsDevice, *m_graphicsDevice->m_d3dDevice.Get(), *m_graphicsDevice->m_dxgiFactory.Get() };
+    auto plane = std::make_unique<Plane>(gDesc, position, scale, color);
+    m_planes.push_back(std::move(plane));
+}
+
+void GraphicsEngine::onUpdate(float dt, bool moveForward, bool moveBackward, bool moveLeft, bool moveRight, float deltaX, float deltaY)
+{
+    m_camera->update(dt, moveForward, moveBackward, moveLeft, moveRight, deltaX, deltaY);
+
+    float engine_dt = static_cast<float>(EngineTime::getDeltaTime());
+    for (auto& cube : m_cubes)
+    {
+        cube->update(engine_dt);
+    }
+
+    if (m_animatedRectangleManager) {
+        static float accumulatedTime = 0.0f;
+        accumulatedTime += engine_dt;
+        float interpFactor = (sinf(accumulatedTime * 1.0f) + 1.0f) / 2.0f;
+        m_animatedRectangleManager->updateAnimation(*m_deviceContext->m_context.Get(), interpFactor);
+    }
+}
+
 void GraphicsEngine::toggleRotation()
 {
     s_rotationEnabled = !s_rotationEnabled;
@@ -242,10 +261,8 @@ void GraphicsEngine::render(SwapChain& swapChain)
 {
     auto& context = *m_deviceContext;
     context.clearAndSetBackBuffer(swapChain, { 0.f, 0.27f, 0.4f, 1.0f });
-
     context.setGraphicsPipelineState(*m_pipeline);
 
-    // this thing matches the viewport to the window size
     D3D11_VIEWPORT viewport = {};
     DXGI_SWAP_CHAIN_DESC desc;
     swapChain.m_swapChain->GetDesc(&desc);
@@ -255,29 +272,28 @@ void GraphicsEngine::render(SwapChain& swapChain)
     viewport.MaxDepth = 1.0f;
     context.m_context->RSSetViewports(1, &viewport);
 
+    m_viewMatrix = m_camera->getViewMatrix();
+
     m_triangleManager->render(*context.m_context.Get());
     m_rectangleManager->render(*context.m_context.Get());
 
-    double dt = dx3d::EngineTime::getDeltaTime();
     for (auto& cube : m_cubes)
     {
-        cube->update(static_cast<float>(dt));
         cube->render(*m_deviceContext->m_context.Get(), m_viewMatrix, m_projectionMatrix);
     }
 
-    // updates and renders animated rectangle
+    // Removed back-face culling temporarily for plane
+    context.m_context->RSSetState(m_rasterizerStateCullNone.Get());
+    for (auto& plane : m_planes)
+    {
+        plane->render(*m_deviceContext->m_context.Get(), m_viewMatrix, m_projectionMatrix);
+    }
+    context.m_context->RSSetState(nullptr);
+
     if (m_animatedRectangleManager) {
-        static float accumulatedTime = 0.0f;
-        accumulatedTime += static_cast<float>(dt);
-
-        float animationSpeed = 1.0f;
-        float interpFactor = (sinf(accumulatedTime * animationSpeed) + 1.0f) / 2.0f;
-
-        m_animatedRectangleManager->updateAnimation(*context.m_context.Get(), interpFactor);
         m_animatedRectangleManager->render(*context.m_context.Get());
     }
 
-    auto& device = *m_graphicsDevice;
-    device.executeCommandList(context);
+    m_graphicsDevice->executeCommandList(context);
     swapChain.present();
 }

@@ -12,7 +12,8 @@ namespace dx3d {
 		virtual void run() final;
 
 	private:
-		void onInternalUpdate();
+		void onUpdate(float dt, bool moveForward, bool moveBackward, bool moveLeft, bool moveRight, float deltaX, float deltaY);
+		void onRender();
 
 	private:
 		std::unique_ptr<Logger> m_loggerPtr{};

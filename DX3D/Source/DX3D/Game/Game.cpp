@@ -23,7 +23,12 @@ dx3d::Game::~Game()
     EngineTime::release();
 }
 
-void dx3d::Game::onInternalUpdate()
+void dx3d::Game::onUpdate(float dt, bool moveForward, bool moveBackward, bool moveLeft, bool moveRight, float deltaX, float deltaY)
+{
+    m_graphicsEngine->onUpdate(dt, moveForward, moveBackward, moveLeft, moveRight, deltaX, deltaY);
+}
+
+void dx3d::Game::onRender()
 {
     m_graphicsEngine->render(m_display->getSwapChain());
 }
