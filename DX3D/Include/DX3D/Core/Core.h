@@ -16,6 +16,8 @@ namespace dx3d {
 
 	class DeviceContext;
 
+	class Circle;
+
 	class ShaderBinary;
 	class GraphicsPipelineState;
 

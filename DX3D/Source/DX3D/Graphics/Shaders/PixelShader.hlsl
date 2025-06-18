@@ -24,7 +24,7 @@ float4 main(PS_INPUT input) : SV_Target
     attenuation = saturate(attenuation * lightIntensity);                     // saturate means clamp apparently
 
     float4 outputColor = input.Color;
-    outputColor.rgb *= attenuation; // modulate object color by light
+    // outputColor.rgb *= attenuation; // modulate object color by light
 
     return outputColor;
 }

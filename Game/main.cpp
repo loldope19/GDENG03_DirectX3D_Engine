@@ -2,7 +2,7 @@
 
 int main() {
 	try {
-		dx3d::Game game({ {1280,720},dx3d::Logger::LogLevel::Info });
+		dx3d::Game game({ {1024,768},dx3d::Logger::LogLevel::Info });
 		game.run();
 	}
 	catch (const std::runtime_error&)

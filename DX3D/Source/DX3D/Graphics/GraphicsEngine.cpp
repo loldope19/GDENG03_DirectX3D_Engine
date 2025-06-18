@@ -3,6 +3,7 @@
 #include <DX3D/Graphics/DeviceContext.h>
 #include <DX3D/Graphics/SwapChain.h>
 #include <DX3D/Graphics/GraphicsLogUtils.h>
+#include <DX3D/Graphics/Circle.h>
 
 using namespace dx3d;
 
@@ -38,16 +39,13 @@ void PSMain()
     m_triangleManager = std::make_unique<Triangle>(gDesc);
     m_rectangleManager = std::make_unique<Rectangle>(gDesc);
     m_cubeManager = std::make_unique<Cube>(gDesc);
+    m_circleManager = std::make_unique<Circle>(gDesc);
 
     //m_triangleManager->initializeSharedResources();
     //m_rectangleManager->initializeSharedResources();
-    m_cubeManager->initializeSharedResources();
+    //m_cubeManager->initializeSharedResources();
+    m_circleManager->initializeSharedResources();
 
-    addCube(0.0f, -0.6f, 0.0f, 0.5f, 1.0f, 0.0f, 0.0f);
-    addCube(0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 1.0f, 0.0f);
-    addCube(0.0f, 0.6f, 0.0f, 0.5f, 0.0f, 0.0f, 1.0f);
-    addCube(0.6f, 0.0f, 0.0f, 0.5f, 1.0f, 1.0f, 0.0f);
-    addCube(-0.6f, 0.0f, 0.0f, 0.5f, 0.0f, 1.0f, 1.0f);
 
     // light constant buffer
     D3D11_BUFFER_DESC lightBufferDesc = {};
@@ -73,13 +71,12 @@ GraphicsDevice& GraphicsEngine::getGraphicsDevice() noexcept
     return *m_graphicsDevice;
 }
 
-// A new public method to allow the Game class to send the 
-// latest mouse position and screen resolution to the GraphicsEngine.
 void dx3d::GraphicsEngine::updateLightData(
     const DirectX::XMFLOAT2& mousePos, const DirectX::XMFLOAT2& screenRes)
 {
     m_lightBufferData.lightScreenPos = mousePos;
     m_lightBufferData.screenResolution = screenRes;
+    m_screenResolution = screenRes;
 }
 
 void GraphicsEngine::addTriangle(float posX, float posY, float size, float r, float g, float b, float a)
@@ -164,10 +161,55 @@ void dx3d::GraphicsEngine::addCube(float posX, float posY, float posZ, float siz
     m_cubeManager->createCube(vertices);
 }
 
+void dx3d::GraphicsEngine::addCircle(float posX, float posY, float radius, int segments, float r, float g, float b, float a)
+{
+    if (segments < 3) return; // circle needs at least 3 segments
+
+    if (m_screenResolution.y == 0) return;
+
+    const float aspectRatio = m_screenResolution.x / m_screenResolution.y;
+
+    std::vector<CircleVertex> vertices;
+    std::vector<UINT> indices;
+
+    float fixedR = r, fixedG = g, fixedB = b;
+    if (r < 0 || g < 0 || b < 0) { 
+        fixedR = fixedG = fixedB = 1.0f;
+    }
+
+    vertices.push_back({ posX, posY, 0.0f, fixedR, fixedG, fixedB, a });
+
+    const float angleStep = 2.0f * DirectX::XM_PI / segments;
+    for (int i = 0; i < segments; ++i)
+    {
+        float currentAngle = i * angleStep;
+        float x = posX + (radius / aspectRatio) * cos(currentAngle);
+        float y = posY + radius * sin(currentAngle);
+        vertices.push_back({ x, y, 0.0f, fixedR, fixedG, fixedB, a });
+    }
+
+    for (int i = 1; i <= segments; ++i)
+    {
+        indices.push_back(0); 
+        indices.push_back((i % segments) + 1);
+        indices.push_back(i);
+    }
+
+    m_circleManager->createCircle(vertices, indices);
+}
+
+void dx3d::GraphicsEngine::clearCircles()
+{
+    if (m_circleManager)
+    {
+        m_circleManager->clear();
+    }
+}
+
 void GraphicsEngine::render(SwapChain& swapChain)
 {
     auto& context = *m_deviceContext;
-    context.clearAndSetBackBuffer(swapChain, { 0.f, 0.27f, 0.4f, 1.0f });
+    context.clearAndSetBackBuffer(swapChain, { 0.0f, 0.0f, 0.0f, 1.0f });
 
     // shaders used by my shape managers will override this so will comment this out for now
     // context.setGraphicsPipelineState(*m_pipeline);
@@ -195,7 +237,8 @@ void GraphicsEngine::render(SwapChain& swapChain)
 
     //m_triangleManager->render(*context.m_context.Get());
     //m_rectangleManager->render(*context.m_context.Get());
-    m_cubeManager->render(*context.m_context.Get());
+    //m_cubeManager->render(*context.m_context.Get());
+    m_circleManager->render(*context.m_context.Get());
 
     auto& device = *m_graphicsDevice;
     device.executeCommandList(context);

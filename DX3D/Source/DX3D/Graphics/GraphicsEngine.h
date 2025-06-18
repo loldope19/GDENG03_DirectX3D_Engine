@@ -4,6 +4,7 @@
 #include <DX3D/Graphics/Triangle.h> 
 #include <DX3D/Graphics/Rectangle.h>
 #include <DX3D/Graphics/Cube.h>
+#include <DX3D/Graphics/Circle.h>
 #include <DX3D/Graphics/Camera.h>
 #include <vector>
 #include <DirectXMath.h>
@@ -42,6 +43,11 @@ namespace dx3d
         void addCube(float posX, float posY, float posZ, float size = 1.0f,
             float r = -1.0f, float g = -1.0f, float b = -1.0f, float a = 1.0f);
 
+        // add a circle at specified position with specified color
+        void addCircle(float posX, float posY, float radius, int segments = 24,
+            float r = -1.0f, float g = -1.0f, float b = -1.0f, float a = 1.0f);
+        void clearCircles();
+
     private:
         std::shared_ptr<GraphicsDevice> m_graphicsDevice{};
         DeviceContextPtr m_deviceContext{};
@@ -50,9 +56,11 @@ namespace dx3d
 
         std::unique_ptr<Triangle> m_triangleManager{};
         std::unique_ptr<Rectangle> m_rectangleManager{};
-        std::unique_ptr<Cube> m_cubeManager{};   // only one used out of all managers
+        std::unique_ptr<Cube> m_cubeManager{};
+        std::unique_ptr<Circle> m_circleManager{};
 
         Microsoft::WRL::ComPtr<ID3D11Buffer> m_lightConstantBuffer{};
         LightConstantBufferData m_lightBufferData{};
+        DirectX::XMFLOAT2 m_screenResolution{};
     };
 }

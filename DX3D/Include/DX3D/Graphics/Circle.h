@@ -20,6 +20,7 @@ namespace dx3d
 		void createCircle(const std::vector<CircleVertex>& vertices,
 						const std::vector<UINT>& indices);
 		void render(ID3D11DeviceContext& context);
+		void clear();
 		size_t getCircleCount() const { return m_vertexBuffers.size(); }
 
 	private:
