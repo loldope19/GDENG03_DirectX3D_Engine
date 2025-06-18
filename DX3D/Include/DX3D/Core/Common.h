@@ -25,6 +25,8 @@ namespace dx3d
     struct GraphicsEngineDesc
     {
         BaseDesc base;
+        i32 windowWidth;
+        i32 windowHeight;
     };
 
     struct GraphicsDeviceDesc

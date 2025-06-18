@@ -4,31 +4,52 @@
 #include <DX3D/Core/Logger.h>
 #include <DX3D/Game/Display.h>
 #include <DX3D/Core/EngineTime.h>
+#include <memory>
+
+// Include the new primitive headers
+#include <DX3D/Graphics/Cube.h>
+#include <DX3D/Graphics/Plane.h>
 
 dx3d::Game::Game(const GameDesc& desc) :
-    Base({ *std::make_unique<Logger>(desc.logLevel).release() }),
-    m_loggerPtr(&m_logger)
+	Base({ *std::make_unique<Logger>(desc.logLevel).release() }),
+	m_loggerPtr(&m_logger)
 {
-    EngineTime::initialize();
+	EngineTime::initialize();
 
-    m_graphicsEngine = std::make_unique<GraphicsEngine>(GraphicsEngineDesc{ m_logger });
-    m_display = std::make_unique<Display>(DisplayDesc{ {m_logger,desc.windowSize},m_graphicsEngine->getGraphicsDevice() });
+	m_graphicsEngine = std::make_unique<GraphicsEngine>(GraphicsEngineDesc{ {m_logger}, desc.windowSize.width, desc.windowSize.height });
+	
+	m_display = std::make_unique<Display>(DisplayDesc{ {m_logger,desc.windowSize}, m_graphicsEngine->getGraphicsDevice() });
+	GraphicsResourceDesc res_desc = m_graphicsEngine->getGraphicsResourceDesc();
 
-    DX3DLogInfo("Game initialized.");
+	auto plane = std::make_unique<Plane>(res_desc);
+	plane->setPosition({0, -2, 0});
+	plane->setScale({20, 1, 20});
+	m_graphicsEngine->addGameObject(std::move(plane));
+
+	auto cube1 = std::make_unique<Cube>(res_desc);
+	cube1->setPosition({0, -1, 0});
+	m_graphicsEngine->addGameObject(std::move(cube1));
+
+	auto cube2 = std::make_unique<Cube>(res_desc);
+	cube2->setPosition({4, -1, 4});
+	cube2->setScale({0.5f, 0.5f, 0.5f});
+	m_graphicsEngine->addGameObject(std::move(cube2));
+
+	DX3DLogInfo("Game initialized with new architecture.");
 }
 
 dx3d::Game::~Game()
 {
-    DX3DLogInfo("Game is shutting down...");
-    EngineTime::release();
+	DX3DLogInfo("Game is shutting down...");
+	EngineTime::release();
 }
 
-void dx3d::Game::onUpdate(float dt, bool moveForward, bool moveBackward, bool moveLeft, bool moveRight, float deltaX, float deltaY)
+void dx3d::Game::onUpdate(float dt)
 {
-    m_graphicsEngine->onUpdate(dt, moveForward, moveBackward, moveLeft, moveRight, deltaX, deltaY);
+	m_graphicsEngine->onUpdate(dt);
 }
 
 void dx3d::Game::onRender()
 {
-    m_graphicsEngine->render(m_display->getSwapChain());
+	m_graphicsEngine->render(m_display->getSwapChain());
 }

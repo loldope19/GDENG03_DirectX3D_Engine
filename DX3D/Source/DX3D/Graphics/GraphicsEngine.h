@@ -1,73 +1,51 @@
 #pragma once
-#include <DX3D/Core/Core.h>
 #include <DX3D/Core/Base.h>
-#include <DX3D/Graphics/Triangle.h> 
-#include <DX3D/Graphics/Rectangle.h>
-#include <DX3D/Graphics/Cube.h>
-#include <DX3D/Graphics/AnimatedRectangle.h>
-#include <DX3D/Graphics/Plane.h>
+#include <DX3D/Core/Common.h>
 #include <DX3D/Game/Camera.h>
-#include <DX3D/Math/Vec4.h>
-#include <DX3D/Math/Matrix4x4.h>
-#include <array>
+#include <DX3D/Graphics/GraphicsResource.h>
+#include <memory>
 #include <vector>
+#include <d3d11.h>
+#include <wrl.h>
 
 namespace dx3d
 {
-    struct VertexState {
-        float x, y, z;
-        Vec4 color;
-    };
+	class SwapChain;
+	class DeviceContext;
+	class GraphicsDevice;
+	class GameObject;
+	class GraphicsPipelineState;
 
-    class GraphicsEngine final : public Base
-    {
-    public:
-        explicit GraphicsEngine(const GraphicsEngineDesc& desc);
-        virtual ~GraphicsEngine() override;
+	class GraphicsEngine final : public Base
+	{
+	public:
+		explicit GraphicsEngine(const GraphicsEngineDesc& desc);
+		virtual ~GraphicsEngine() noexcept;
 
-        GraphicsDevice& getGraphicsDevice() noexcept;
+		GraphicsDevice& getGraphicsDevice() const;
+		GraphicsResourceDesc getGraphicsResourceDesc() const;
 
-        void render(SwapChain& swapChain);
+		void render(SwapChain& swapChain);
+		void onUpdate(float dt);
+		void addGameObject(std::unique_ptr<GameObject> go);
 
-        // add a triangle at specified position with specified color
-        void addTriangle(float posX, float posY, float size = 1.0f,
-            float r = -1.0f, float g = -1.0f, float b = -1.0f, float a = 1.0f);
+		DeviceContextPtr getDeviceContext() const { return m_deviceContext; }
+		Matrix4x4 getViewMatrix() const;
+		Matrix4x4 getProjectionMatrix() const;
 
-        // add a rectangle at specified position with specified size and color
-        void addRectangle(float posX, float posY, float width = 1.0f, float height = 1.0f,
-            float r = -1.0f, float g = -1.0f, float b = -1.0f, float a = 1.0f);
+		void updateConstantBuffer(const Matrix4x4& world, const Matrix4x4& view, const Matrix4x4& projection);
 
-        // add a cube at specified position with specified size and color
-        void createCube(const Vec3& position, const Vec3& scale, const Vec3& rotationAxis, float rotationSpeed);
+	private:
+		friend class GameObject;
 
-        void addAnimatedRectangle(
-            const std::array<VertexState, 4>& state_A_vertices,
-            const std::array<VertexState, 4>& state_B_vertices
-        );
+		std::shared_ptr<GraphicsDevice> m_graphicsDevice;
+		DeviceContextPtr m_deviceContext;
 
-        static void toggleRotation();
-        static bool isRotationEnabled();
+		std::unique_ptr<Camera> m_camera;
+		std::vector<std::unique_ptr<GameObject>> m_gameObjects;
 
-        void createPlane(const Vec3& position, const Vec3& scale, const Vec4& color);
-        void onUpdate(float dt, bool moveForward, bool moveBackward, bool moveLeft, bool moveRight, float deltaX, float deltaY);
-
-
-    private:
-        std::shared_ptr<GraphicsDevice> m_graphicsDevice{};
-        DeviceContextPtr m_deviceContext{};
-        GraphicsPipelineStatePtr m_pipeline{};
-        Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullNone{};
-
-        std::unique_ptr<Triangle> m_triangleManager{};
-        std::unique_ptr<Rectangle> m_rectangleManager{};
-        std::vector<std::unique_ptr<Cube>> m_cubes;
-        std::unique_ptr<AnimatedRectangle> m_animatedRectangleManager{};
-        std::vector<std::unique_ptr<Plane>> m_planes;
-        std::unique_ptr<Camera> m_camera;
-
-        static bool s_rotationEnabled;
-
-        Matrix4x4 m_viewMatrix;
-        Matrix4x4 m_projectionMatrix;
-    };
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_constantBuffer;
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullNone;
+		GraphicsPipelineStatePtr m_pipeline;
+	};
 }

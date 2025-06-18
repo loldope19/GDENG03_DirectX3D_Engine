@@ -1,31 +1,30 @@
 #pragma once
-#include <DX3D/Math/Vec3.h>
 #include <DX3D/Math/Matrix4x4.h>
+#include <DX3D/Math/Vec3.h>
 
 namespace dx3d
 {
-    class Camera
-    {
-    public:
-        Camera(const Vec3& position, float movementSpeed, float rotationSpeed);
+	class Camera
+	{
+	public:
+		Camera();
 
-        void update(float dt, bool moveForward, bool moveBackward, bool moveLeft, bool moveRight, float deltaX, float deltaY);
-        Matrix4x4 getViewMatrix();
+		void update(float dt);
+		void setProjection(float fovDegrees, float aspectRatio, float nearZ, float farZ);
 
-    private:
-        void updateViewMatrix();
+		const Matrix4x4& getViewMatrix() const;
+		const Matrix4x4& getProjectionMatrix() const;
 
-        Vec3 m_position;
-        float m_movementSpeed;
-        float m_rotationSpeed;
+	private:
+		void updateViewMatrix();
 
-        float m_yaw = 1.5707963f; // PI / 2
-        float m_pitch = 0.0f;
+		Matrix4x4 m_viewMatrix;
+		Matrix4x4 m_projectionMatrix;
 
-        Vec3 m_forward = { 0.0f, 0.0f, 1.0f };
-        Vec3 m_right = { 1.0f, 0.0f, 0.0f };
-        Vec3 m_up = { 0.0f, 1.0f, 0.0f };
+		Vec3 m_position = { 0, 0, -5.0f }; // Start a bit further back
+		Vec3 m_direction;
 
-        Matrix4x4 m_viewMatrix;
-    };
+		float m_yaw = 0.0f;
+		float m_pitch = 0.0f;
+	};
 }
