@@ -15,7 +15,6 @@ namespace dx3d
 		const float moveSpeed = 200.0f * dt;
 		const float rotSpeed = 20.0f * dt;
 
-		const Vec3 worldUp = { 0, 1, 0 };
 		const Vec3 right = Vec3::cross(worldUp, m_direction).normalized();
 
 		if (input->isKeyDown('W')) m_position += m_direction * moveSpeed;
@@ -44,8 +43,6 @@ namespace dx3d
 
 		m_direction = rotationMatrix.getZDirection();
 		m_direction.normalize();
-
-		const Vec3 worldUp = { 0, 1, 0 };
 
 		m_viewMatrix.lookAt(m_position, m_position + m_direction, worldUp);
 	}

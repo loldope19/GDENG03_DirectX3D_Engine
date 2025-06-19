@@ -26,5 +26,6 @@ namespace dx3d
 
 		float m_yaw = 0.0f;
 		float m_pitch = 0.0f;
+		const Vec3 worldUp = { 0, 1, 0 };
 	};
 }

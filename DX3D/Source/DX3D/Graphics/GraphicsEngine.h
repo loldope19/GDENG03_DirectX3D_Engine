@@ -28,6 +28,7 @@ namespace dx3d
 		void render(SwapChain& swapChain);
 		void onUpdate(float dt);
 		void addGameObject(std::unique_ptr<GameObject> go);
+		void selectObject(size_t index);
 
 		DeviceContextPtr getDeviceContext() const { return m_deviceContext; }
 		Matrix4x4 getViewMatrix() const;
@@ -38,6 +39,8 @@ namespace dx3d
 	private:
 		friend class GameObject;
 
+		GameObject* m_selectedObject = nullptr;
+
 		std::shared_ptr<GraphicsDevice> m_graphicsDevice;
 		DeviceContextPtr m_deviceContext;
 
@@ -46,6 +49,8 @@ namespace dx3d
 
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_constantBuffer;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullNone;
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullBack;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState;
 		GraphicsPipelineStatePtr m_pipeline;
 	};
 }

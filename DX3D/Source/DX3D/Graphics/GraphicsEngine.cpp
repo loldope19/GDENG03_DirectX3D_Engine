@@ -3,8 +3,9 @@
 #include <DX3D/Graphics/DeviceContext.h>
 #include <DX3D/Graphics/SwapChain.h>
 #include <DX3D/Graphics/GraphicsPipelineState.h>
-#include <DX3D/Game/GameObject.h>
 #include <DX3D/Graphics/GraphicsLogUtils.h>
+#include <DX3D/Game/GameObject.h>
+#include <DX3D/Game/InputManager.h>
 
 namespace dx3d
 {
@@ -36,6 +37,19 @@ namespace dx3d
 		rasterizerDesc.FrontCounterClockwise = FALSE;
 		rasterizerDesc.DepthClipEnable = TRUE;
 		m_graphicsDevice->m_d3dDevice->CreateRasterizerState(&rasterizerDesc, &m_rasterizerStateCullNone);
+
+		D3D11_RASTERIZER_DESC cullBackDesc = {};
+		cullBackDesc.FillMode = D3D11_FILL_SOLID;
+		cullBackDesc.CullMode = D3D11_CULL_BACK;
+		cullBackDesc.FrontCounterClockwise = FALSE;
+		cullBackDesc.DepthClipEnable = TRUE;
+		m_graphicsDevice->m_d3dDevice->CreateRasterizerState(&cullBackDesc, &m_rasterizerStateCullBack);
+
+		D3D11_DEPTH_STENCIL_DESC depthStencilDesc = {};
+		depthStencilDesc.DepthEnable = TRUE;
+		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		m_graphicsDevice->m_d3dDevice->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
 	}
 
 	GraphicsEngine::~GraphicsEngine() = default;
@@ -48,12 +62,51 @@ namespace dx3d
 		{
 			go->update(dt);
 		}
+
+		if (m_selectedObject)
+		{
+			auto input = InputManager::getInstance();
+			const float moveSpeed = 5.0f * dt;
+			const float rotSpeed = 1.5f * dt;
+			const float scaleSpeed = 1.0f * dt;
+
+			Vec3 currentPos = m_selectedObject->getPosition();
+			Vec3 currentRot = m_selectedObject->getRotation();
+			Vec3 currentScale = m_selectedObject->getScale();
+
+			// Position Controls (I, K, J, L, U, O)
+			if (input->isKeyDown('I')) currentPos.z += moveSpeed;
+			if (input->isKeyDown('K')) currentPos.z -= moveSpeed;
+			if (input->isKeyDown('J')) currentPos.x -= moveSpeed;
+			if (input->isKeyDown('L')) currentPos.x += moveSpeed;
+			if (input->isKeyDown('U')) currentPos.y += moveSpeed;
+			if (input->isKeyDown('O')) currentPos.y -= moveSpeed;
+
+			m_selectedObject->setPosition(currentPos);
+
+			// Rotation Controls (Arrow Keys)
+			if (input->isKeyDown(VK_UP)) currentRot.x -= rotSpeed;
+			if (input->isKeyDown(VK_DOWN)) currentRot.x += rotSpeed;
+			if (input->isKeyDown(VK_LEFT)) currentRot.y -= rotSpeed;
+			if (input->isKeyDown(VK_RIGHT)) currentRot.y += rotSpeed;
+
+			m_selectedObject->setRotation(currentRot);
+
+			// Scale Controls (+/- keys)
+			if (input->isKeyDown(VK_OEM_PLUS)) currentScale += Vec3(scaleSpeed, scaleSpeed, scaleSpeed);
+			if (input->isKeyDown(VK_OEM_MINUS)) currentScale -= Vec3(scaleSpeed, scaleSpeed, scaleSpeed);
+
+			m_selectedObject->setScale(currentScale);
+		}
 	}
 
 	void GraphicsEngine::render(SwapChain& swapChain)
 	{
 		auto& context = *m_deviceContext;
 		context.clearAndSetBackBuffer(swapChain, { 0.1f, 0.1f, 0.15f, 1.0f });
+
+		context.m_context->OMSetDepthStencilState(m_depthStencilState.Get(), 0);
+		context.m_context->RSSetState(m_rasterizerStateCullNone.Get());
 
 		D3D11_VIEWPORT viewport = {};
 		DXGI_SWAP_CHAIN_DESC desc;
@@ -78,6 +131,20 @@ namespace dx3d
 	void GraphicsEngine::addGameObject(std::unique_ptr<GameObject> go)
 	{
 		m_gameObjects.push_back(std::move(go));
+	}
+
+	void GraphicsEngine::selectObject(size_t index)
+	{
+		if (index < m_gameObjects.size())
+		{
+			m_selectedObject = m_gameObjects[index].get();
+			DX3DLogInfo("Selected object at index");
+		}
+		else
+		{
+			m_selectedObject = nullptr;
+			DX3DLogInfo("Deselected all objects.");
+		}
 	}
 
 	void GraphicsEngine::updateConstantBuffer(const Matrix4x4& world, const Matrix4x4& view, const Matrix4x4& projection)

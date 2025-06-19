@@ -10,8 +10,11 @@ namespace dx3d
 
     InputManager::InputManager()
     {
-        // Initialize key states
-        ::GetKeyboardState(m_keyState);
+        if (!::GetKeyboardState(m_keyState))
+        {
+            memset(m_keyState, 0, sizeof(m_keyState));
+        }
+
         memcpy(m_prevKeyState, m_keyState, sizeof(m_keyState));
     }
 
@@ -36,10 +39,8 @@ namespace dx3d
 
     void InputManager::update()
     {
-        // Update previous key state
         memcpy(m_prevKeyState, m_keyState, sizeof(m_keyState));
 
-        // Update mouse delta
         POINT currentMousePos;
         ::GetCursorPos(&currentMousePos);
 
