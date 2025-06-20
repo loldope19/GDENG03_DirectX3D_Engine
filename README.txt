@@ -23,8 +23,6 @@ Controls
 -----------------------------------------
 - Right-Click + Mouse Move: Look around with the camera.
 - Right-Click + WASD Keys: Move the camera forward, left, backward, and right.
-- Spacebar: Toggle the rotation of the cubes.
-- +/- Keys: Adjust the engine's time scale (slow-motion/fast-forward).
 
 
 Project Entry Point
