@@ -16,6 +16,13 @@ namespace dx3d
 		Matrix4x4 projection;
 	};
 
+	struct MaterialConstantBuffer
+	{
+		Vec4 color;
+		bool overrideColor;
+		float padding[3];
+	};
+
 	GraphicsEngine::GraphicsEngine(const GraphicsEngineDesc& desc) : Base(desc.base)
 	{
 		m_graphicsDevice = std::make_shared<GraphicsDevice>(GraphicsDeviceDesc{ m_logger });
@@ -50,6 +57,14 @@ namespace dx3d
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 		m_graphicsDevice->m_d3dDevice->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
+
+		D3D11_BUFFER_DESC materialConstBufferDesc = {};
+		materialConstBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		materialConstBufferDesc.ByteWidth = sizeof(MaterialConstantBuffer);
+		materialConstBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		materialConstBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		DX3DGraphicsLogThrowOnFail(m_graphicsDevice->m_d3dDevice->CreateBuffer(&materialConstBufferDesc, nullptr, &m_materialConstantBuffer), "Failed to create material constant buffer");
+
 	}
 
 	GraphicsEngine::~GraphicsEngine() = default;
@@ -67,7 +82,7 @@ namespace dx3d
 		{
 			auto input = InputManager::getInstance();
 			const float moveSpeed = 5.0f * dt;
-			const float rotSpeed = 1.5f * dt;
+			const float rotSpeed = 10000.0f * dt;
 			const float scaleSpeed = 1.0f * dt;
 
 			Vec3 currentPos = m_selectedObject->getPosition();
@@ -90,6 +105,9 @@ namespace dx3d
 			if (input->isKeyDown(VK_LEFT)) currentRot.y -= rotSpeed;
 			if (input->isKeyDown(VK_RIGHT)) currentRot.y += rotSpeed;
 
+			currentRot.x += rotSpeed;
+			currentRot.y += rotSpeed;
+			currentRot.z += rotSpeed;
 			m_selectedObject->setRotation(currentRot);
 
 			// Scale Controls (+/- keys)
@@ -118,9 +136,18 @@ namespace dx3d
 		context.m_context->RSSetViewports(1, &viewport);
 
 		context.m_context->VSSetConstantBuffers(0, 1, m_constantBuffer.GetAddressOf());
+		context.m_context->PSSetConstantBuffers(0, 1, m_materialConstantBuffer.GetAddressOf());
+
 
 		for (auto const& go : m_gameObjects)
 		{
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+			context.m_context->Map(m_materialConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+			auto materialDataPtr = static_cast<MaterialConstantBuffer*>(mappedResource.pData);
+			materialDataPtr->overrideColor = go->m_overrideColor;
+			materialDataPtr->color = go->m_color;
+			context.m_context->Unmap(m_materialConstantBuffer.Get(), 0);
+
 			go->render(this);
 		}
 

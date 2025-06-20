@@ -76,11 +76,11 @@ namespace dx3d
 			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 		DX3DGraphicsLogThrowOnFail(m_device.CreateInputLayout(layoutDesc, 2, m_vertexShader->getByteCode().data(), m_vertexShader->getByteCode().size(), &m_inputLayout), "Failed to create cube input layout");
-	}
 
+	}												// new scale
+	
 	void Cube::update(float dt)
 	{
-
 	}
 
 	void Cube::render(GraphicsEngine* engine)

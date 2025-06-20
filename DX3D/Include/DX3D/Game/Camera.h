@@ -21,11 +21,11 @@ namespace dx3d
 		Matrix4x4 m_viewMatrix;
 		Matrix4x4 m_projectionMatrix;
 
-		Vec3 m_position = { 0, 0, -5.0f }; // Start a bit further back
+		Vec3 m_position = { 8.0f, 5.0f, -12.0f }; // Start a bit further back
 		Vec3 m_direction;
 
-		float m_yaw = 0.0f;
-		float m_pitch = 0.0f;
+		float m_yaw = -0.6f;
+		float m_pitch = -0.3f;
 		const Vec3 worldUp = { 0, 1, 0 };
 	};
 }

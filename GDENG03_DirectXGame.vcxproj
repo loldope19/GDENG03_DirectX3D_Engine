@@ -167,6 +167,7 @@
     <ClInclude Include="DX3D\Include\DX3D\Game\Camera.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\GameObject.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\InputManager.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Game\PropertyAnimator.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\AnimatedRectangle.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Capsule.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Cube.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Shader.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Sphere.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Triangle.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Math\Mathf.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Matrix4x4.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Vec3.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\DeviceContext.h" />

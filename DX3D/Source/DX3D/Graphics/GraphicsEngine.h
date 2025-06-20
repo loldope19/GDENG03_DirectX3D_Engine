@@ -48,9 +48,11 @@ namespace dx3d
 		std::vector<std::unique_ptr<GameObject>> m_gameObjects;
 
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_constantBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_materialConstantBuffer;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullNone;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullBack;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState;
 		GraphicsPipelineStatePtr m_pipeline;
+
 	};
 }

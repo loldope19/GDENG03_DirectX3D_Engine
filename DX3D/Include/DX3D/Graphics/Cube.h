@@ -1,6 +1,7 @@
 #pragma once
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Graphics/Shader.h>
+#include <DX3D/Game/PropertyAnimator.h>
 
 namespace dx3d
 {
@@ -24,5 +25,9 @@ namespace dx3d
 
 		UINT m_stride = 0;
 		UINT m_offset = 0;
+
+		PropertyAnimator m_scaleAnimator;
+		PropertyAnimator m_positionAnimator;
+		Vec3 m_rotationSpeed;
 	};
 }

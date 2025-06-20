@@ -1,5 +1,6 @@
 #pragma once
 #include <DX3D/Math/Vec3.h>
+#include <DX3D/Math/Vec4.h>
 #include <DX3D/Math/Matrix4x4.h>
 #include <DX3D/Graphics/GraphicsResource.h>
 
@@ -18,6 +19,10 @@ namespace dx3d
         // common virtual methods for all game objects
         virtual void update(float dt) {}
         virtual void render(class GraphicsEngine* engine) = 0;
+
+        void setColor(const Vec3& color) { m_color = { color.x, color.y, color.z, 1.0f }; m_overrideColor = true; }
+        void setColor(const Vec4& color) { m_color = color; m_overrideColor = true; }
+        void resetColor() { m_overrideColor = false; }
 
         void setPosition(const Vec3& pos) { m_position = pos; updateWorldMatrix(); }
         void setScale(const Vec3& scale) { m_scale = scale; updateWorldMatrix(); }
@@ -49,5 +54,9 @@ namespace dx3d
         Vec3 m_position;
         Vec3 m_scale;
         Vec3 m_rotation;
+
+    public:
+        Vec4 m_color;
+        bool m_overrideColor;
     };
 }
