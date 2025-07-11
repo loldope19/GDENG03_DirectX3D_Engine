@@ -35,16 +35,20 @@ dx3d::Game::Game(const GameDesc& desc) :
 	auto plane = std::make_unique<Plane>(res_desc);
 	plane->setColor(Vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	plane->setScale(Vec3(20.0f, 20.0f, 20.0f));
+	plane->setName("Plane");
 	m_graphicsEngine->addGameObject(std::move(plane));
 
 	auto cube = std::make_unique<Cube>(res_desc);
 	cube->setScale(Vec3(3.0f, 3.0f, 3.0f));
+	cube->setName("Cube");
 	m_graphicsEngine->addGameObject(std::move(cube));
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	ImGui::StyleColorsDark();
 
 	// Initialize the backends

@@ -1,5 +1,6 @@
 #include <DX3D/Game/Camera.h>
 #include <DX3D/Game/InputManager.h>
+#include <IMGUI/imgui.h>
 #include <cmath>
 
 namespace dx3d
@@ -10,33 +11,38 @@ namespace dx3d
 		updateViewMatrix();
 	}
 
-	void Camera::update(float dt)
-	{
-		auto input = InputManager::getInstance();
-		const float moveSpeed = 10.0f * dt;
-		const float rotSpeed = 0.2f * dt;
+    void Camera::update(float dt)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        auto input = InputManager::getInstance();
 
-		if (input->isRightMouseDown())
-		{
-			float mouseX, mouseY;
-			input->getMouseDelta(mouseX, mouseY);
+        Vec3 newPos = m_position;
+        float movementSpeed = 10.0f * dt;
+        float rotationSpeed = 0.5f * dt;
+                
+        if (input->isKeyDown('W')) { newPos += m_forward * movementSpeed; }
+        if (input->isKeyDown('S')) { newPos -= m_forward * movementSpeed; }
+        if (input->isKeyDown('A')) { newPos -= m_right * movementSpeed; }
+        if (input->isKeyDown('D')) { newPos += m_right * movementSpeed; }
+        if (input->isKeyDown('Q')) { newPos -= m_up * movementSpeed; }
+        if (input->isKeyDown('E')) { newPos += m_up * movementSpeed; }
 
-			m_yaw += mouseX * rotSpeed;
-			m_pitch -= mouseY * rotSpeed; // Invert for natural feel
+        m_position = newPos;
 
-			m_pitch = std::max(-1.55f, std::min(1.55f, m_pitch)); // Clamp to ~89 degrees
-		}
+        if (input->isRightMouseDown() && !ImGui::IsAnyItemActive())
+        {
+            float deltaX = 0.0f;
+            float deltaY = 0.0f;
+            input->getMouseDelta(deltaX, deltaY);
 
-		if (input->isKeyDown('W')) m_position += m_forward * moveSpeed;
-		if (input->isKeyDown('S')) m_position -= m_forward * moveSpeed;
-		if (input->isKeyDown('A')) m_position -= m_right * moveSpeed;
-		if (input->isKeyDown('D')) m_position += m_right * moveSpeed;
-		if (input->isKeyDown('E')) m_position += m_worldUp * moveSpeed;
-		if (input->isKeyDown('Q')) m_position -= m_worldUp * moveSpeed;
+            m_yaw += deltaX * rotationSpeed;
+            m_pitch -= deltaY * rotationSpeed;
+            m_pitch = std::clamp(m_pitch, -1.57f, 1.57f);
+        }
 
-		updateVectors();
-		updateViewMatrix();
-	}
+        updateVectors();
+        updateViewMatrix();
+    }
 
 	void Camera::updateVectors()
 	{

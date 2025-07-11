@@ -166,10 +166,10 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Triangle.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Math\Math.cpp" />
     <ClCompile Include="DX3D\Vendor\IMGUI\imgui.cpp" />
-    <ClCompile Include="DX3D\Vendor\IMGUI\imgui_demo.cpp" />
     <ClCompile Include="DX3D\Vendor\IMGUI\imgui_draw.cpp" />
     <ClCompile Include="DX3D\Vendor\IMGUI\imgui_impl_dx11.cpp" />
     <ClCompile Include="DX3D\Vendor\IMGUI\imgui_impl_win32.cpp" />
+    <ClCompile Include="DX3D\Vendor\IMGUI\imgui_tables.cpp" />
     <ClCompile Include="DX3D\Vendor\IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="Game\main.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Window\Win32\Win32Window.cpp" />

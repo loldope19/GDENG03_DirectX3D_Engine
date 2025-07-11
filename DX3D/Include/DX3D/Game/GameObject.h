@@ -3,6 +3,7 @@
 #include <DX3D/Math/Vec4.h>
 #include <DX3D/Math/Matrix4x4.h>
 #include <DX3D/Graphics/GraphicsResource.h>
+#include <string>
 
 namespace dx3d
 {
@@ -34,6 +35,9 @@ namespace dx3d
 
         Matrix4x4 getWorldMatrix() const { return m_worldMatrix; }
 
+        const std::string& getName() const { return m_name; }
+        void setName(const std::string& name) { m_name = name; }
+
     protected:
         void updateWorldMatrix()
         {
@@ -53,6 +57,8 @@ namespace dx3d
         Vec3 m_position;
         Vec3 m_scale;
         Vec3 m_rotation;
+
+        std::string m_name = "GameObject";
 
     public:
         Vec4 m_color;

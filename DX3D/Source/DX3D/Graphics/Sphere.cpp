@@ -104,11 +104,21 @@ namespace dx3d
 	void Sphere::render(GraphicsEngine* engine)
 	{
 		engine->updateConstantBuffer(m_worldMatrix, engine->getViewMatrix(), engine->getProjectionMatrix());
-
 		auto context = engine->getDeviceContext()->m_context.Get();
 
+		auto cullNoneState = engine->getRasterizerStateCullNone();
+		auto cullBackState = engine->getRasterizerStateCullBack();
+
+		context->RSSetState(cullNoneState);
 		context->IASetInputLayout(m_inputLayout.Get());
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->VSSetShader(m_vertexShader->getVertexShader(), nullptr, 0);
+		context->PSSetShader(m_pixelShader->getPixelShader(), nullptr, 0);
+
+		UINT stride = sizeof(SphereVertex);
+		UINT offset = 0;
+		context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		context->VSSetShader(m_vertexShader->getVertexShader(), nullptr, 0);
 		context->PSSetShader(m_pixelShader->getPixelShader(), nullptr, 0);
 
@@ -117,5 +127,6 @@ namespace dx3d
 		context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		context->DrawIndexed(m_indexCount, 0, 0);
+		context->RSSetState(cullBackState);
 	}
 }

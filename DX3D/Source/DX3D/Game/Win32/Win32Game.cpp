@@ -24,11 +24,6 @@ void dx3d::Game::run()
 				continue;
 			}
 
-			if (ImGui_ImplWin32_WndProcHandler(msg.hwnd, msg.message, msg.wParam, msg.lParam))
-			{
-				continue;
-			}
-
 			InputManager::getInstance()->processMessage(msg);
 
 			TranslateMessage(&msg);

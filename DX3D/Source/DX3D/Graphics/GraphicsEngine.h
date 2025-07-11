@@ -3,6 +3,7 @@
 #include <DX3D/Core/Common.h>
 #include <DX3D/Game/Camera.h>
 #include <DX3D/Graphics/GraphicsResource.h>
+#include <IMGUI/imgui.h> 
 #include <memory>
 #include <vector>
 #include <d3d11.h>
@@ -29,12 +30,24 @@ namespace dx3d
 		void onUpdate(float dt);
 		void addGameObject(std::unique_ptr<GameObject> go);
 		void selectObject(size_t index);
+		void removeGameObject(GameObject* object);
 
 		DeviceContextPtr getDeviceContext() const { return m_deviceContext; }
 		Matrix4x4 getViewMatrix() const;
 		Matrix4x4 getProjectionMatrix() const;
 
 		void updateConstantBuffer(const Matrix4x4& world, const Matrix4x4& view, const Matrix4x4& projection);
+		void recreateSceneResources(UINT width, UINT height);
+
+		ID3D11RasterizerState* getRasterizerStateCullNone() { return m_rasterizerStateCullNone.Get(); }
+		ID3D11RasterizerState* getRasterizerStateCullBack() { return m_rasterizerStateCullBack.Get(); }
+
+		// --- Editor UI Rendering ---
+		void renderEditorUI();
+		void renderMenuBar();
+		void renderSceneHierarchy();
+		void renderInspector();
+		void renderSceneView();
 
 	private:
 		friend class GameObject;
@@ -53,6 +66,11 @@ namespace dx3d
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullBack;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState;
 		GraphicsPipelineStatePtr m_pipeline;
+
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_sceneRenderTargetView;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_sceneDepthStencilView;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_sceneShaderResourceView;
+		ImVec2 m_sceneViewSize = {};
 
 		float m_fpsUpdateTimer = 0.0f;
 		int m_frameCount = 0;
