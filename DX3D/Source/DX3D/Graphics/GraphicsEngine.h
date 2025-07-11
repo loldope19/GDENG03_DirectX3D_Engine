@@ -54,5 +54,10 @@ namespace dx3d
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState;
 		GraphicsPipelineStatePtr m_pipeline;
 
+		float m_fpsUpdateTimer = 0.0f;
+		int m_frameCount = 0;
+		float m_lastFPS = 0.0f;
+		const float FPS_UPDATE_INTERVAL = 0.5f;
+
 	};
 }

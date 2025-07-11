@@ -22,12 +22,6 @@ namespace dx3d
     {
         switch (msg.message)
         {
-        case WM_KEYDOWN:
-            m_keyState[msg.wParam] = 0x80; // Set high bit
-            break;
-        case WM_KEYUP:
-            m_keyState[msg.wParam] = 0;
-            break;
         case WM_RBUTTONDOWN:
             m_rightMouseDown = true;
             break;
@@ -40,6 +34,11 @@ namespace dx3d
     void InputManager::update()
     {
         memcpy(m_prevKeyState, m_keyState, sizeof(m_keyState));
+
+        if (!::GetKeyboardState(m_keyState))
+        {
+            memset(m_keyState, 0, sizeof(m_keyState));
+        }
 
         POINT currentMousePos;
         ::GetCursorPos(&currentMousePos);

@@ -43,7 +43,8 @@ SwapChainPtr dx3d::GraphicsDevice::createSwapChain(const SwapChainDesc& desc)
 
 DeviceContextPtr dx3d::GraphicsDevice::createDeviceContext()
 {
-    return std::make_shared<DeviceContext>(getGraphicsResourceDesc());
+    return std::make_shared<DeviceContext>(getGraphicsResourceDesc(), m_d3dContext);
+    //return std::make_shared<DeviceContext>(getGraphicsResourceDesc());
 }
 
 ShaderBinaryPtr dx3d::GraphicsDevice::compileShader(const ShaderCompileDesc& desc)

@@ -5,19 +5,28 @@
 #include <Windows.h>
 #include <algorithm>
 
+#include <IMGUI/imgui_impl_win32.h>
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 void dx3d::Game::run()
 {
 	MSG msg{};
+	const double targetFrameTime = 1.0 / 60.0;
+	double frameDuration;
+
 	while (m_isRunning)
 	{
-		EngineTime::logFrameStart();
-		InputManager::getInstance()->update();
-
-		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			if (msg.message == WM_QUIT) {
+			if (msg.message == WM_QUIT)
+			{
 				m_isRunning = false;
-				break;
+				continue;
+			}
+
+			if (ImGui_ImplWin32_WndProcHandler(msg.hwnd, msg.message, msg.wParam, msg.lParam))
+			{
+				continue;
 			}
 
 			InputManager::getInstance()->processMessage(msg);
@@ -25,37 +34,22 @@ void dx3d::Game::run()
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+		else
+		{
+			float dt = static_cast<float>(EngineTime::getDeltaTime());
 
-		if (!m_isRunning) break;
+			EngineTime::logFrameStart();
 
-		float newScale = EngineTime::getTimeScale();
-		if (InputManager::getInstance()->isKeyUp(VK_OEM_PLUS)) {
-			DX3DLogInfo("Engine Time increased.");
-			newScale += 0.5f; EngineTime::setTimeScale(newScale);
-		}
-		else if (InputManager::getInstance()->isKeyUp(VK_OEM_MINUS)) {
-			DX3DLogInfo("Engine Time decreased.");
-			newScale -= 0.5f; EngineTime::setTimeScale(newScale);
-		}
+			InputManager::getInstance()->update();
+			onUpdate(dt);
+			onRender();
 
-		if (InputManager::getInstance()->isKeyUp('1')) {
-			m_graphicsEngine->selectObject(0); // Select Plane
+			do
+			{
+				EngineTime::logFrameEnd();
+				frameDuration = EngineTime::getUnscaledDeltaTime();
+				if (targetFrameTime - frameDuration > 0.002) { Sleep(1); }
+			} while (frameDuration < targetFrameTime);
 		}
-		if (InputManager::getInstance()->isKeyUp('2')) {
-			m_graphicsEngine->selectObject(1); // Select Cube 1
-		}
-		if (InputManager::getInstance()->isKeyUp('3')) {
-			m_graphicsEngine->selectObject(2); // Select Cube 2
-		}
-		if (InputManager::getInstance()->isKeyUp('0')) {
-			m_graphicsEngine->selectObject(-1); // Deselect
-		}
-
-		EngineTime::logFrameEnd();
-		float dt = static_cast<float>(EngineTime::getDeltaTime());
-		dt = std::min(dt, 1.0f / 60.0f);
-
-		onUpdate(dt);
-		onRender();
 	}
 }

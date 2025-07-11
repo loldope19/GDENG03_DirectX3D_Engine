@@ -6,6 +6,11 @@
 #include <DX3D/Graphics/GraphicsLogUtils.h>
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/InputManager.h>
+#include <DX3D/Core/EngineTime.h>
+
+#include <IMGUI/imgui.h>
+#include <IMGUI/imgui_impl_win32.h>
+#include <IMGUI/imgui_impl_dx11.h>
 
 namespace dx3d
 {
@@ -73,53 +78,41 @@ namespace dx3d
 	{
 		m_camera->update(dt);
 
-		for (auto const& go : m_gameObjects)
-		{
-			go->update(dt);
-		}
-
-		if (m_selectedObject)
-		{
-			auto input = InputManager::getInstance();
-			const float moveSpeed = 5.0f * dt;
-			const float rotSpeed = 10000.0f * dt;
-			const float scaleSpeed = 1.0f * dt;
-
-			Vec3 currentPos = m_selectedObject->getPosition();
-			Vec3 currentRot = m_selectedObject->getRotation();
-			Vec3 currentScale = m_selectedObject->getScale();
-
-			// Position Controls (I, K, J, L, U, O)
-			if (input->isKeyDown('I')) currentPos.z += moveSpeed;
-			if (input->isKeyDown('K')) currentPos.z -= moveSpeed;
-			if (input->isKeyDown('J')) currentPos.x -= moveSpeed;
-			if (input->isKeyDown('L')) currentPos.x += moveSpeed;
-			if (input->isKeyDown('U')) currentPos.y += moveSpeed;
-			if (input->isKeyDown('O')) currentPos.y -= moveSpeed;
-
-			m_selectedObject->setPosition(currentPos);
-
-			// Rotation Controls (Arrow Keys)
-			if (input->isKeyDown(VK_UP)) currentRot.x -= rotSpeed;
-			if (input->isKeyDown(VK_DOWN)) currentRot.x += rotSpeed;
-			if (input->isKeyDown(VK_LEFT)) currentRot.y -= rotSpeed;
-			if (input->isKeyDown(VK_RIGHT)) currentRot.y += rotSpeed;
-
-			currentRot.x += rotSpeed;
-			currentRot.y += rotSpeed;
-			currentRot.z += rotSpeed;
-			m_selectedObject->setRotation(currentRot);
-
-			// Scale Controls (+/- keys)
-			if (input->isKeyDown(VK_OEM_PLUS)) currentScale += Vec3(scaleSpeed, scaleSpeed, scaleSpeed);
-			if (input->isKeyDown(VK_OEM_MINUS)) currentScale -= Vec3(scaleSpeed, scaleSpeed, scaleSpeed);
-
-			m_selectedObject->setScale(currentScale);
-		}
 	}
 
 	void GraphicsEngine::render(SwapChain& swapChain)
 	{
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+		{
+			double deltaTime = EngineTime::getDeltaTime();
+			m_fpsUpdateTimer += static_cast<float>(deltaTime);
+			m_frameCount++;
+
+			if (m_fpsUpdateTimer >= FPS_UPDATE_INTERVAL)
+			{
+				m_lastFPS = static_cast<float>(m_frameCount) / m_fpsUpdateTimer;
+
+				m_frameCount = 0;
+				m_fpsUpdateTimer = 0.0f;
+			}
+
+			ImGui::SetNextWindowPos(ImVec2(10, 10));
+			ImGui::SetNextWindowBgAlpha(0.35f);
+			ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+			if (ImGui::Begin("FPS Counter", nullptr, flags))
+			{
+				ImGui::Text("%.1f FPS (%.2f ms)", m_lastFPS, deltaTime * 1000.0);
+			}
+			ImGui::End();
+		}
+
+		//ImGui::ShowDemoWindow();
+		ImGui::Render();
+
 		auto& context = *m_deviceContext;
 		context.clearAndSetBackBuffer(swapChain, { 0.1f, 0.1f, 0.15f, 1.0f });
 
@@ -151,7 +144,13 @@ namespace dx3d
 			go->render(this);
 		}
 
-		m_graphicsDevice->executeCommandList(context);
+		// m_graphicsDevice->executeCommandList(context);
+		
+		auto immediateContext = m_graphicsDevice->m_d3dContext.Get();
+		float color[] = { 0.1f, 0.1f, 0.15f, 1.0f };
+		immediateContext->OMSetRenderTargets(1, swapChain.m_rtv.GetAddressOf(), swapChain.m_dsv.Get());
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
 		swapChain.present();
 	}
 
@@ -181,12 +180,9 @@ namespace dx3d
 		context->Map(m_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		auto dataPtr = static_cast<ConstantBuffer*>(mappedResource.pData);
 
-		dataPtr->world = world;
-		dataPtr->world.transpose();
-		dataPtr->view = view;
-		dataPtr->view.transpose();
-		dataPtr->projection = projection;
-		dataPtr->projection.transpose();
+		dataPtr->world = Matrix4x4::transpose(world);
+		dataPtr->view = Matrix4x4::transpose(view);
+		dataPtr->projection = Matrix4x4::transpose(projection);
 
 		context->Unmap(m_constantBuffer.Get(), 0);
 	}

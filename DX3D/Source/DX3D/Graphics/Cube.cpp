@@ -77,7 +77,7 @@ namespace dx3d
 		};
 		DX3DGraphicsLogThrowOnFail(m_device.CreateInputLayout(layoutDesc, 2, m_vertexShader->getByteCode().data(), m_vertexShader->getByteCode().size(), &m_inputLayout), "Failed to create cube input layout");
 
-	}												// new scale
+	}
 	
 	void Cube::update(float dt)
 	{

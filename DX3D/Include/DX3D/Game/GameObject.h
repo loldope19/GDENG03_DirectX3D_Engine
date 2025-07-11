@@ -37,16 +37,15 @@ namespace dx3d
     protected:
         void updateWorldMatrix()
         {
-            Matrix4x4 scaleMatrix, rotationMatrix, translationMatrix;
-            scaleMatrix.setScale(m_scale);
+            Matrix4x4 scaleMatrix = Matrix4x4::createScale(m_scale);
 
-            Matrix4x4 rotX, rotY, rotZ;
-            rotX.setRotationX(m_rotation.x);
-            rotY.setRotationY(m_rotation.y);
-            rotZ.setRotationZ(m_rotation.z);
-            rotationMatrix = rotZ * rotY * rotX;
+            Matrix4x4 rotX = Matrix4x4::createRotationX(m_rotation.x);
+            Matrix4x4 rotY = Matrix4x4::createRotationY(m_rotation.y);
+            Matrix4x4 rotZ = Matrix4x4::createRotationZ(m_rotation.z);
+            Matrix4x4 rotationMatrix = rotZ * rotY * rotX;
 
-            translationMatrix.setTranslation(m_position);
+            Matrix4x4 translationMatrix = Matrix4x4::createTranslation(m_position);
+
             m_worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
         }
 

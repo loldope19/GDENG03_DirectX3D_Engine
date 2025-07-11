@@ -9,6 +9,8 @@ namespace dx3d {
 		explicit Window(const WindowDesc& desc);
 		virtual ~Window() override;
 
+		void* getHandle() const { return m_handle; }
+
 	protected:
 		void* m_handle{};
 		Rect m_size{};

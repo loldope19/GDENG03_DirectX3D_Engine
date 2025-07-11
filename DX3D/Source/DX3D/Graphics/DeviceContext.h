@@ -8,6 +8,8 @@ namespace dx3d
 	{
 	public:
 		explicit DeviceContext(const GraphicsResourceDesc& gDesc);
+		explicit DeviceContext(const GraphicsResourceDesc& gDesc, const Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context);
+
 		void clearAndSetBackBuffer(const SwapChain& swapChain, const Vec4& color);
 		void setGraphicsPipelineState(const GraphicsPipelineState& pipeline);
 

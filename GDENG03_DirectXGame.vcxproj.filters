@@ -60,6 +60,16 @@
     <ClCompile Include="DX3D\Source\DX3D\Game\Camera.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Plane.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\InputManager.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Capsule.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Cylinder.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Sphere.cpp" />
+    <ClCompile Include="DX3D\Vendor\IMGUI\imgui.cpp" />
+    <ClCompile Include="DX3D\Vendor\IMGUI\imgui_demo.cpp" />
+    <ClCompile Include="DX3D\Vendor\IMGUI\imgui_draw.cpp" />
+    <ClCompile Include="DX3D\Vendor\IMGUI\imgui_impl_dx11.cpp" />
+    <ClCompile Include="DX3D\Vendor\IMGUI\imgui_impl_win32.cpp" />
+    <ClCompile Include="DX3D\Vendor\IMGUI\imgui_widgets.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Math\Math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
@@ -95,5 +105,21 @@
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Plane.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\InputManager.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\GameObject.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Game\PropertyAnimator.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Graphics\Capsule.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Graphics\Cylinder.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Graphics\Sphere.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Math\Mathf.h" />
+    <ClInclude Include="DX3D\Vendor\IMGUI\imconfig.h" />
+    <ClInclude Include="DX3D\Vendor\IMGUI\imgui.h" />
+    <ClInclude Include="DX3D\Vendor\IMGUI\imgui_impl_dx11.h" />
+    <ClInclude Include="DX3D\Vendor\IMGUI\imgui_impl_win32.h" />
+    <ClInclude Include="DX3D\Vendor\IMGUI\imgui_internal.h" />
+    <ClInclude Include="DX3D\Vendor\IMGUI\imstb_rectpack.h" />
+    <ClInclude Include="DX3D\Vendor\IMGUI\imstb_textedit.h" />
+    <ClInclude Include="DX3D\Vendor\IMGUI\imstb_truetype.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DX3D\Vendor\IMGUI\imgui.ini" />
   </ItemGroup>
 </Project>
