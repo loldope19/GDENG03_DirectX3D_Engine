@@ -41,6 +41,7 @@ namespace dx3d
 
 		ID3D11RasterizerState* getRasterizerStateCullNone() { return m_rasterizerStateCullNone.Get(); }
 		ID3D11RasterizerState* getRasterizerStateCullBack() { return m_rasterizerStateCullBack.Get(); }
+		ID3D11SamplerState* getSamplerState() { return m_samplerState.Get(); }
 
 		// --- Editor UI Rendering ---
 		void renderEditorUI();
@@ -65,6 +66,7 @@ namespace dx3d
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullNone;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullBack;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState;
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
 		GraphicsPipelineStatePtr m_pipeline;
 
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_sceneRenderTargetView;

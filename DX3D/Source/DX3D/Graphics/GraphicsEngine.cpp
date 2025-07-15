@@ -9,6 +9,7 @@
 #include <DX3D/Core/EngineTime.h>
 
 #include <DX3D/Graphics/Cube.h>
+#include <DX3D/Graphics/TexturedCube.h>
 #include <DX3D/Graphics/Plane.h>
 #include <DX3D/Graphics/Sphere.h>
 #include <DX3D/Graphics/Capsule.h>
@@ -71,6 +72,17 @@ namespace dx3d
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 		m_graphicsDevice->m_d3dDevice->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
+		DX3DGraphicsLogThrowOnFail(m_graphicsDevice->m_d3dDevice->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState), "Failed to create depth stencil state.");
+
+		D3D11_SAMPLER_DESC samplerDesc = {};
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+		samplerDesc.MinLOD = 0;
+		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+		DX3DGraphicsLogThrowOnFail(m_graphicsDevice->m_d3dDevice->CreateSamplerState(&samplerDesc, &m_samplerState), "Failed to create sampler state");
 
 		D3D11_BUFFER_DESC materialConstBufferDesc = {};
 		materialConstBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -86,7 +98,6 @@ namespace dx3d
 	void GraphicsEngine::onUpdate(float dt)
 	{
 		m_camera->update(dt);
-
 	}
 
 	void GraphicsEngine::render(SwapChain& swapChain)
@@ -206,7 +217,7 @@ namespace dx3d
 		textureDesc.Height = height;
 		textureDesc.MipLevels = 1;
 		textureDesc.ArraySize = 1;
-		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.Usage = D3D11_USAGE_DEFAULT;
 		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
@@ -301,7 +312,6 @@ namespace dx3d
 			{
 				if (ImGui::MenuItem("Exit"))
 				{
-					// In a real app, you'd post a quit message.
 					// For now, we can just log it.
 					DX3DLogInfo("Exit menu item clicked.");
 				}
@@ -342,6 +352,13 @@ namespace dx3d
 					cylinder->setName("Cylinder");
 					addGameObject(std::move(cylinder));
 				}
+				if (ImGui::MenuItem("Textured Cube"))
+				{
+					auto texturedCube = std::make_unique<TexturedCube>(getGraphicsResourceDesc(), L"Assets/Textures/lmao.png");
+					texturedCube->setName("TexturedCube");
+					texturedCube->setScale(Vec3(2.0f, 2.0f, 2.0f));
+					addGameObject(std::move(texturedCube));
+				}
 				// ... add other primitives as needed
 				ImGui::EndMenu();
 			}
@@ -359,7 +376,7 @@ namespace dx3d
 			GameObject* go = m_gameObjects[i].get();
 			if (!go) continue;
 
-			ImGui::PushID(i);
+			ImGui::PushID((int)i);
 
 			const bool isSelected = (m_selectedObject == go);
 			const std::string& name = go->getName();
@@ -434,13 +451,11 @@ namespace dx3d
 					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 				}
 
-				// If the user edits the color, we automatically re-enable the override for them.
 				if (ImGui::ColorEdit4("Color", &m_selectedObject->m_color.x))
 				{
 					m_selectedObject->m_overrideColor = true;
 				}
 
-				// If the color picker was disabled, re-enable input for subsequent UI elements.
 				if (!m_selectedObject->m_overrideColor)
 				{
 					ImGui::PopItemFlag();
@@ -472,7 +487,7 @@ namespace dx3d
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		if (viewportPanelSize.x != m_sceneViewSize.x || viewportPanelSize.y != m_sceneViewSize.y)
 		{
-			recreateSceneResources(viewportPanelSize.x, viewportPanelSize.y);
+			recreateSceneResources((UINT) viewportPanelSize.x, (UINT) viewportPanelSize.y);
 			m_camera->setProjection(90.0f, viewportPanelSize.x / viewportPanelSize.y, 0.1f, 1000.0f);
 		}
 

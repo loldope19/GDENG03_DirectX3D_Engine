@@ -10,6 +10,7 @@
 
 // Include the new primitive headers
 #include <DX3D/Graphics/Cube.h>
+#include <DX3D/Graphics/TexturedCube.h>
 #include <DX3D/Graphics/Plane.h>
 #include <DX3D/Graphics/Sphere.h>
 #include <DX3D/Graphics/Cylinder.h>
@@ -32,16 +33,22 @@ dx3d::Game::Game(const GameDesc& desc) :
 	m_display = std::make_unique<Display>(DisplayDesc{ {m_logger,desc.windowSize}, m_graphicsEngine->getGraphicsDevice() });
 	GraphicsResourceDesc res_desc = m_graphicsEngine->getGraphicsResourceDesc();
 
+	
 	auto plane = std::make_unique<Plane>(res_desc);
 	plane->setColor(Vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	plane->setScale(Vec3(20.0f, 20.0f, 20.0f));
 	plane->setName("Plane");
 	m_graphicsEngine->addGameObject(std::move(plane));
-
+	/*
 	auto cube = std::make_unique<Cube>(res_desc);
 	cube->setScale(Vec3(3.0f, 3.0f, 3.0f));
 	cube->setName("Cube");
 	m_graphicsEngine->addGameObject(std::move(cube));
+
+	auto texCube = std::make_unique<TexturedCube>(res_desc, L"Assets/Textures/lmao.png");
+	texCube->setPosition({ 0, 2, 0 });
+	m_graphicsEngine->addGameObject(std::move(texCube));
+	*/
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

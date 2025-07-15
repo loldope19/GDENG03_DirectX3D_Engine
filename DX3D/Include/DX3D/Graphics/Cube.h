@@ -7,7 +7,7 @@ namespace dx3d
 {
 	class Shader;
 
-	class Cube final : public GameObject
+	class Cube : public GameObject
 	{
 	public:
 		Cube(const GraphicsResourceDesc& gDesc);
@@ -15,7 +15,7 @@ namespace dx3d
 		void update(float dt) override;
 		void render(GraphicsEngine* engine) override;
 
-	private:
+	protected:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer;
 

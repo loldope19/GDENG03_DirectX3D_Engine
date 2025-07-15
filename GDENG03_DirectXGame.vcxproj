@@ -121,7 +121,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,6 +163,8 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Plane.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Shader.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Sphere.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Texture.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\TexturedCube.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Triangle.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Math\Math.cpp" />
     <ClCompile Include="DX3D\Vendor\IMGUI\imgui.cpp" />
@@ -192,9 +194,11 @@
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Plane.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Shader.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Sphere.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Graphics\TexturedCube.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Triangle.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Mathf.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Matrix4x4.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Math\Vec2.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Vec3.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\DeviceContext.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\Display.h" />
@@ -216,6 +220,7 @@
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Rectangle.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\ShaderBinary.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineState.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Texture.h" />
     <ClInclude Include="DX3D\Vendor\IMGUI\imconfig.h" />
     <ClInclude Include="DX3D\Vendor\IMGUI\imgui.h" />
     <ClInclude Include="DX3D\Vendor\IMGUI\imgui_impl_dx11.h" />

@@ -70,6 +70,8 @@
     <ClCompile Include="DX3D\Vendor\IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="DX3D\Vendor\IMGUI\imgui_draw.cpp" />
     <ClCompile Include="DX3D\Vendor\IMGUI\imgui_tables.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\TexturedCube.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
@@ -118,6 +120,9 @@
     <ClInclude Include="DX3D\Vendor\IMGUI\imstb_textedit.h" />
     <ClInclude Include="DX3D\Vendor\IMGUI\imstb_truetype.h" />
     <ClInclude Include="DX3D\Vendor\IMGUI\imconfig.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Graphics\TexturedCube.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Texture.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Math\Vec2.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DX3D\Vendor\IMGUI\imgui.ini" />
