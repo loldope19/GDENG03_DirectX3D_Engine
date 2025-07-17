@@ -97,8 +97,9 @@ namespace dx3d
 		DX3DGraphicsLogThrowOnFail(m_device.CreateInputLayout(layoutDesc, 2, m_vertexShader->getByteCode().data(), m_vertexShader->getByteCode().size(), &m_inputLayout), "Failed to create sphere input layout");
 	}
 
-	void Sphere::update(float dt)
+	void Sphere::onUpdate(float dt)
 	{
+		GameObject::onUpdate(dt);
 	}
 
 	void Sphere::render(GraphicsEngine* engine)

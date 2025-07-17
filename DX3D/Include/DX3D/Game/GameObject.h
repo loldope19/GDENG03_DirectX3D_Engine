@@ -5,6 +5,10 @@
 #include <DX3D/Graphics/GraphicsResource.h>
 #include <string>
 
+#include <DX3D/ECS/AComponent.h>
+#include <vector>
+#include <memory>
+
 namespace dx3d
 {
     class GameObject : public GraphicsResource
@@ -17,10 +21,45 @@ namespace dx3d
         }
         virtual ~GameObject() = default;
 
-        // common virtual methods for all game objects
-        virtual void update(float dt) {}
+        virtual void onUpdate(float dt)
+        {
+            for (const auto& comp : m_components)
+            {
+                comp->onUpdate(dt);
+            }
+        }
         virtual void render(class GraphicsEngine* engine) = 0;
 
+        // --- Component Management ---
+        template<typename T, typename... TArgs>
+        T* addComponent(TArgs&&... args)
+        {
+            static_assert(std::is_base_of<AComponent, T>::value, "T must derive from AComponent");
+
+            auto newComponent = std::make_unique<T>(this, std::forward<TArgs>(args)...);
+            T* componentPtr = newComponent.get();
+            m_components.push_back(std::move(newComponent));
+
+            return componentPtr;
+        }
+
+        template<typename T>
+        T* getComponent()
+        {
+            static_assert(std::is_base_of<AComponent, T>::value, "T must derive from AComponent");
+
+            for (const auto& comp : m_components)
+            {
+                if (T* target = dynamic_cast<T*>(comp.get()))
+                {
+                    return target;
+                }
+            }
+            return nullptr;
+        }
+
+
+        // --- Transform and Color Getters/Setters ---
         void setColor(const Vec3& color) { m_color = { color.x, color.y, color.z, 1.0f }; m_overrideColor = true; }
         void setColor(const Vec4& color) { m_color = color; m_overrideColor = true; }
         void resetColor() { m_overrideColor = false; }
@@ -37,6 +76,14 @@ namespace dx3d
 
         const std::string& getName() const { return m_name; }
         void setName(const std::string& name) { m_name = name; }
+
+        void setWorldMatrix(const Matrix4x4& matrix) { m_worldMatrix = matrix; }
+
+    public:
+        const std::vector<std::unique_ptr<AComponent>>& getComponents() const { return m_components; }
+
+    private:
+        std::vector<std::unique_ptr<AComponent>> m_components;
 
     protected:
         void updateWorldMatrix()
@@ -55,13 +102,14 @@ namespace dx3d
 
         Matrix4x4 m_worldMatrix;
         Vec3 m_position;
-        Vec3 m_scale;
         Vec3 m_rotation;
+        Vec3 m_scale;
 
+        // For Inspector use
         std::string m_name = "GameObject";
+        Vec4 m_color = { 1,1,1,1 };
+        bool m_overrideColor = false;
 
-    public:
-        Vec4 m_color;
-        bool m_overrideColor;
+        friend class GraphicsEngine;
     };
 }

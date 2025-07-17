@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace dx3d
 {
@@ -16,6 +17,7 @@ namespace dx3d
         ~Logger();
 
         void log(LogLevel level, const char* message);
+        void log(LogLevel level, const std::string& message);
 
     protected:
         Logger(const Logger&) = delete;

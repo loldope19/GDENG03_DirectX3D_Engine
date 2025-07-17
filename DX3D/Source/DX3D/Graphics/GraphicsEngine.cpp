@@ -6,7 +6,9 @@
 #include <DX3D/Graphics/GraphicsLogUtils.h>
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/InputManager.h>
+#include <DX3D/Game/Game.h>
 #include <DX3D/Core/EngineTime.h>
+#include <DX3D/ECS/PhysicsComponent.h>
 
 #include <DX3D/Graphics/Cube.h>
 #include <DX3D/Graphics/TexturedCube.h>
@@ -19,6 +21,8 @@
 #include <IMGUI/imgui_impl_win32.h>
 #include <IMGUI/imgui_impl_dx11.h>
 #include <IMGUI/imgui_internal.h>
+
+#include <reactphysics3d/reactphysics3d.h>
 
 namespace dx3d
 {
@@ -36,7 +40,8 @@ namespace dx3d
 		float padding[3];
 	};
 
-	GraphicsEngine::GraphicsEngine(const GraphicsEngineDesc& desc) : Base(desc.base)
+	GraphicsEngine::GraphicsEngine(const GraphicsEngineDesc& desc, PhysicsSystem* physicsSystem, Game* game)
+		: Base(desc.base), m_physicsSystem(physicsSystem), m_game(game)
 	{
 		m_graphicsDevice = std::make_shared<GraphicsDevice>(GraphicsDeviceDesc{ m_logger });
 		m_deviceContext = m_graphicsDevice->createDeviceContext();
@@ -98,6 +103,11 @@ namespace dx3d
 	void GraphicsEngine::onUpdate(float dt)
 	{
 		m_camera->update(dt);
+
+		for (auto const& go : m_gameObjects)
+		{
+			go->onUpdate(dt);
+		}
 	}
 
 	void GraphicsEngine::render(SwapChain& swapChain)
@@ -359,6 +369,15 @@ namespace dx3d
 					texturedCube->setScale(Vec3(2.0f, 2.0f, 2.0f));
 					addGameObject(std::move(texturedCube));
 				}
+
+				if (ImGui::MenuItem("Placeholder Cube Clump"))
+				{
+					spawnPlaceholderCubeClump();
+				}
+				if (ImGui::MenuItem("Placeholder Plane"))
+				{
+					spawnPlaceholderPlane();
+				}
 				// ... add other primitives as needed
 				ImGui::EndMenu();
 			}
@@ -415,30 +434,105 @@ namespace dx3d
 			// --- TRANSFORM ---
 			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				Vec3 position = m_selectedObject->getPosition();
+				Vec3 position, rotationInDegrees, scale;
+				auto physicsComponent = m_selectedObject->getComponent<PhysicsComponent>();
+
+				// --- REAL-TIME UPDATE LOGIC ---
+				if (physicsComponent)
+				{
+					// If there's a physics component, it is the source of truth.
+					const auto& transform = physicsComponent->getRigidBody()->getTransform();
+					const auto& pos = transform.getPosition();
+					const auto& orientation = transform.getOrientation();
+
+					position = { pos.x, pos.y, pos.z };
+
+					// Convert quaternion to Euler angles (in radians) for display
+					// Note: This is a simplified conversion and might have gimbal lock issues
+					// in extreme cases, but is good for most UI display purposes.
+					float sinr_cosp = 2 * (orientation.w * orientation.x + orientation.y * orientation.z);
+					float cosr_cosp = 1 - 2 * (orientation.x * orientation.x + orientation.y * orientation.y);
+					float sinp = 2 * (orientation.w * orientation.y - orientation.z * orientation.x);
+					float siny_cosp = 2 * (orientation.w * orientation.z + orientation.x * orientation.y);
+					float cosy_cosp = 1 - 2 * (orientation.y * orientation.y + orientation.z * orientation.z);
+
+					Vec3 rotationInRadians;
+					rotationInRadians.x = std::atan2(sinr_cosp, cosr_cosp); // Roll
+					rotationInRadians.y = std::asin(sinp);                // Pitch
+					rotationInRadians.z = std::atan2(siny_cosp, cosy_cosp); // Yaw
+
+					rotationInDegrees = rotationInRadians * (180.0f / 3.1415926535f);
+				}
+				else
+				{
+					// If no physics, get values from the GameObject directly.
+					position = m_selectedObject->getPosition();
+					rotationInDegrees = m_selectedObject->getRotation() * (180.0f / 3.1415926535f);
+				}
+
+				// --- UI WIDGETS ---
+
+				// Position
 				if (ImGui::DragFloat3("Position", &position.x, 0.1f))
 				{
-					m_selectedObject->setPosition(position);
+					if (physicsComponent)
+					{
+						auto* body = physicsComponent->getRigidBody();
+						reactphysics3d::Transform currentTransform = body->getTransform();
+						currentTransform.setPosition({ position.x, position.y, position.z });
+						body->setTransform(currentTransform);
+					}
+					else { m_selectedObject->setPosition(position); }
 				}
 
-				const float PI = 3.1415926535f;
-				const float radToDeg = 180.0f / PI;
-				const float degToRad = PI / 180.0f;
-
-				Vec3 rotationInDegrees = m_selectedObject->getRotation() * radToDeg;
+				// Rotation
 				if (ImGui::DragFloat3("Rotation", &rotationInDegrees.x, 1.0f))
 				{
-					m_selectedObject->setRotation(rotationInDegrees * degToRad);
+					rotationInDegrees.y = std::max(-89.9f, std::min(89.9f, rotationInDegrees.y));
+
+					Vec3 newRotationInRadians = rotationInDegrees * (3.1415926535f / 180.0f);
+					if (physicsComponent)
+					{
+						auto* body = physicsComponent->getRigidBody();
+						reactphysics3d::Transform currentTransform = body->getTransform();
+						reactphysics3d::Quaternion newOrientation = reactphysics3d::Quaternion::fromEulerAngles(
+							newRotationInRadians.x, newRotationInRadians.y, newRotationInRadians.z
+						);
+						currentTransform.setOrientation(newOrientation);
+						body->setTransform(currentTransform);
+					}
+					else { m_selectedObject->setRotation(newRotationInRadians); }
 				}
 
-				Vec3 scale = m_selectedObject->getScale();
-				if (ImGui::DragFloat3("Scale", &scale.x, 0.1f))
+				// --- CONDITIONAL SCALE UI ---
+				scale = m_selectedObject->getScale();
+				if (physicsComponent)
 				{
-					m_selectedObject->setScale(scale);
+					// If physics is present, disable scale editing.
+					ImGui::Text("Scale");
+					ImGui::SameLine();
+					ImGui::TextDisabled("%.2f, %.2f, %.2f (Physics Controlled)", scale.x, scale.y, scale.z);
+				}
+				else
+				{
+					// Otherwise, allow normal scale editing.
+					if (ImGui::DragFloat3("Scale", &scale.x, 0.1f))
+					{
+						m_selectedObject->setScale(scale);
+					}
 				}
 			}
 
 			ImGui::Spacing();
+
+			for (const auto& component : m_selectedObject->getComponents())
+			{
+				ImGui::Spacing();
+				if (ImGui::CollapsingHeader(component->getName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					component->renderInInspector();
+				}
+			}
 
 			// --- MATERIAL ---
 			if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
@@ -492,8 +586,74 @@ namespace dx3d
 		}
 
 		ImGui::Image((void*)m_sceneShaderResourceView.Get(), viewportPanelSize);
-
+		renderSceneControls();
 		ImGui::End();
+	}
+
+	void GraphicsEngine::renderSceneControls()
+	{
+		ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() * 0.5f - 40.0f, 25.0f));
+
+		if (m_game->getEngineState() == Game::EngineState::Stopped || m_game->getEngineState() == Game::EngineState::Paused)
+		{
+			if (ImGui::Button("Play"))
+			{
+				m_game->play();
+			}
+		}
+		else 
+		{
+			if (ImGui::Button("Stop"))
+			{
+				m_game->stop();
+			}
+		}
+	}
+
+	void GraphicsEngine::spawnPlaceholderCubeClump()
+	{
+		auto res_desc = getGraphicsResourceDesc();
+
+		for (int i = 0; i < 20; ++i)
+		{
+			auto cube = std::make_unique<Cube>(res_desc);
+
+			float offsetX = static_cast<float>(rand() % 100) / 200.0f;
+			float offsetY = static_cast<float>(rand() % 100) / 200.0f;
+			float offsetZ = static_cast<float>(rand() % 100) / 200.0f;
+
+			cube->setPosition({ offsetX, 10.0f + offsetY, offsetZ });
+			cube->setName("Physics Cube");
+
+			auto cubePhysics = cube->addComponent<PhysicsComponent>(m_physicsSystem, PhysicsComponent::BodyShape::Box, cube->getScale());
+			cubePhysics->getRigidBody()->setLinearDamping(0.2f);
+			cubePhysics->getRigidBody()->setAngularDamping(0.5f);
+			cubePhysics->getRigidBody()->getCollider(0)->getMaterial().setBounciness(0.6f);
+			addGameObject(std::move(cube));
+		}
+	}
+
+	void GraphicsEngine::spawnPlaceholderPlane()
+	{
+		auto res_desc = getGraphicsResourceDesc();
+
+		auto groundPlane = std::make_unique<Plane>(res_desc);
+		groundPlane->setPosition({ 0, 0, 0 });
+		groundPlane->setScale({ 10, 0.1f, 10 }); // A large, thin plane
+		groundPlane->setName("Placeholder Plane");
+
+		auto groundPhysics = groundPlane->addComponent<PhysicsComponent>(
+			m_physicsSystem,
+			PhysicsComponent::BodyShape::Box,
+			groundPlane->getScale(),
+			Vec3{ 0.0f, -groundPlane->getScale().y / 2.0f, 0.0f }
+		);
+		groundPhysics->getRigidBody()->setType(reactphysics3d::BodyType::STATIC);
+
+		reactphysics3d::Material& groundMaterial = groundPhysics->getRigidBody()->getCollider(0)->getMaterial();
+		groundMaterial.setFrictionCoefficient(0.7f);
+
+		addGameObject(std::move(groundPlane));
 	}
 
 	Matrix4x4 GraphicsEngine::getViewMatrix() const { return m_camera->getViewMatrix(); }

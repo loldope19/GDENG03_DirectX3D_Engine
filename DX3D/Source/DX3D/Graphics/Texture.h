@@ -2,6 +2,8 @@
 #include <DX3D/Graphics/GraphicsResource.h>
 #include <string>
 
+#include <DirectXTex.h>
+
 namespace dx3d
 {
     class Texture final : public GraphicsResource

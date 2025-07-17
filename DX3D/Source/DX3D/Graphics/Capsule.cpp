@@ -104,6 +104,11 @@ namespace dx3d
 		DX3DGraphicsLogThrowOnFail(m_device.CreateInputLayout(layoutDesc, 2, m_vertexShader->getByteCode().data(), m_vertexShader->getByteCode().size(), &m_inputLayout), "Failed to create capsule input layout");
 	}
 
+	void Capsule::onUpdate(float dt)
+	{
+		GameObject::onUpdate(dt);
+	}
+
 	void Capsule::render(GraphicsEngine* engine)
 	{
 		engine->updateConstantBuffer(m_worldMatrix, engine->getViewMatrix(), engine->getProjectionMatrix());

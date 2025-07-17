@@ -72,6 +72,9 @@
     <ClCompile Include="DX3D\Vendor\IMGUI\imgui_tables.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\TexturedCube.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Texture.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\ECS\PhysicsSystem.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Game\GameObject.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\ECS\PhysicsComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
@@ -123,8 +126,13 @@
     <ClInclude Include="DX3D\Include\DX3D\Graphics\TexturedCube.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\Texture.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Vec2.h" />
+    <ClInclude Include="DX3D\Include\DX3D\ECS\AComponent.h" />
+    <ClInclude Include="DX3D\Include\DX3D\ECS\BaseComponentSystem.h" />
+    <ClInclude Include="DX3D\Include\DX3D\ECS\PhysicsSystem.h" />
+    <ClInclude Include="DX3D\Include\DX3D\ECS\PhysicsComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DX3D\Vendor\IMGUI\imgui.ini" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

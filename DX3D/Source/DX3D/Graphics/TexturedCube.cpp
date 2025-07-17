@@ -67,6 +67,11 @@ namespace dx3d
         DX3DGraphicsLogThrowOnFail(m_device.CreateInputLayout(layoutDesc, 2, m_vertexShader->getByteCode().data(), m_vertexShader->getByteCode().size(), &m_inputLayout), "Failed to create textured cube input layout");
     }
 
+    void TexturedCube::onUpdate(float dt)
+    {
+        GameObject::onUpdate(dt);
+    }
+
     void TexturedCube::render(GraphicsEngine* engine)
     {
         auto context = engine->getDeviceContext()->m_context.Get();

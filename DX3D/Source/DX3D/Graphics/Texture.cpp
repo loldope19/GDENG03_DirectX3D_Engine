@@ -1,14 +1,9 @@
 #include <DX3D/Graphics/Texture.h>
 #include <DX3D/Graphics/GraphicsLogUtils.h>
-#include <wincodec.h>
-#include <shlwapi.h>
-#include <vector>
-#include <iostream>
-
-#pragma comment(lib, "windowscodecs.lib")
 
 namespace dx3d
 {
+    /*
     Texture::Texture(const GraphicsResourceDesc& desc, const std::wstring& filePath) : GraphicsResource(desc)
     {
         if (!PathFileExistsW(filePath.c_str()))
@@ -69,5 +64,31 @@ namespace dx3d
         DX3DGraphicsLogThrowOnFail(m_device.CreateShaderResourceView(texture2D.Get(), NULL, &m_shaderResourceView), "Failed to create shader resource view from texture");
 
         CoUninitialize();
+    }
+    */
+
+    Texture::Texture(const GraphicsResourceDesc& desc, const std::wstring& filePath) : GraphicsResource(desc)
+    {
+        DirectX::ScratchImage scratchImage;
+        DX3DGraphicsLogThrowOnFail(
+            DirectX::LoadFromWICFile(
+                filePath.c_str(),
+                DirectX::WIC_FLAGS_NONE,
+                nullptr,
+                scratchImage
+            ),
+            "Failed to load image from file using DirectXTex."
+        );
+
+        DX3DGraphicsLogThrowOnFail(
+            DirectX::CreateShaderResourceView(
+                &m_device,
+                scratchImage.GetImages(),
+                scratchImage.GetImageCount(),
+                scratchImage.GetMetadata(),
+                m_shaderResourceView.GetAddressOf()
+            ),
+            "Failed to create shader resource view from DirectXTex image."
+        );
     }
 }

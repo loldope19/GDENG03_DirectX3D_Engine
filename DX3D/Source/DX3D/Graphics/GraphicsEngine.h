@@ -3,6 +3,7 @@
 #include <DX3D/Core/Common.h>
 #include <DX3D/Game/Camera.h>
 #include <DX3D/Graphics/GraphicsResource.h>
+#include <DX3D/ECS/PhysicsSystem.h> 
 #include <IMGUI/imgui.h> 
 #include <memory>
 #include <vector>
@@ -16,11 +17,12 @@ namespace dx3d
 	class GraphicsDevice;
 	class GameObject;
 	class GraphicsPipelineState;
+	class Game;
 
 	class GraphicsEngine final : public Base
 	{
 	public:
-		explicit GraphicsEngine(const GraphicsEngineDesc& desc);
+		explicit GraphicsEngine(const GraphicsEngineDesc& desc, PhysicsSystem* physicsSystem, Game* game);
 		virtual ~GraphicsEngine() noexcept;
 
 		GraphicsDevice& getGraphicsDevice() const;
@@ -49,6 +51,10 @@ namespace dx3d
 		void renderSceneHierarchy();
 		void renderInspector();
 		void renderSceneView();
+		void renderSceneControls();
+
+		void spawnPlaceholderCubeClump();
+		void spawnPlaceholderPlane();
 
 	private:
 		friend class GameObject;
@@ -73,6 +79,9 @@ namespace dx3d
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_sceneDepthStencilView;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_sceneShaderResourceView;
 		ImVec2 m_sceneViewSize = {};
+
+		PhysicsSystem* m_physicsSystem = nullptr;
+		Game* m_game = nullptr;
 
 		float m_fpsUpdateTimer = 0.0f;
 		int m_frameCount = 0;

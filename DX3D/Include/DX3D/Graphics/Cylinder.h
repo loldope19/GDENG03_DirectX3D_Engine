@@ -9,6 +9,7 @@ namespace dx3d
 	public:
 		Cylinder(const GraphicsResourceDesc& gDesc);
 
+		void onUpdate(float dt) override;
 		void render(GraphicsEngine* engine) override;
 
 	private:

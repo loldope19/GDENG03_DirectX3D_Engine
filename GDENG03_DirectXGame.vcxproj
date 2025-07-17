@@ -74,11 +74,13 @@
     <OutDir>Bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Intermediate\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>DX3D/Include;DX3D/Source;DX3D/Vendor;$(IncludePath)</IncludePath>
+    <LibraryPath>DX3D/Vendor/Libs/rp3d/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>DX3D/Include;DX3D/Source;DX3D/Vendor;$(IncludePath)</IncludePath>
     <OutDir>Bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Intermediate\$(Platform)\$(Configuration)\</IntDir>
+    <LibraryPath>DX3D/Vendor/Libs/rp3d/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -112,16 +114,18 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <AdditionalIncludeDirectories>$(ProjectDir)DX3D\Vendor\Libs\rp3d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;shlwapi.lib;reactphysics3d_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(Project_Dir)DX3D\Vendor\Libs\rp3d\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,18 +139,23 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)DX3D\Vendor\Libs\rp3d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;shlwapi.lib;reactphysics3d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(Project_Dir)DX3D\Vendor\Libs\rp3d\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DX3D\Source\DX3D\Core\EngineTime.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\ECS\PhysicsComponent.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\ECS\PhysicsSystem.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\Camera.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Game\GameObject.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\InputManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\AnimatedRectangle.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Capsule.cpp" />
@@ -183,6 +192,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\EngineTime.h" />
+    <ClInclude Include="DX3D\Include\DX3D\ECS\AComponent.h" />
+    <ClInclude Include="DX3D\Include\DX3D\ECS\BaseComponentSystem.h" />
+    <ClInclude Include="DX3D\Include\DX3D\ECS\PhysicsComponent.h" />
+    <ClInclude Include="DX3D\Include\DX3D\ECS\PhysicsSystem.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\Camera.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\GameObject.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\InputManager.h" />
@@ -232,8 +245,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DX3D\Vendor\IMGUI\imgui.ini" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\directxtex_desktop_win10.2025.7.10.1\build\native\directxtex_desktop_win10.targets" Condition="Exists('packages\directxtex_desktop_win10.2025.7.10.1\build\native\directxtex_desktop_win10.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\directxtex_desktop_win10.2025.7.10.1\build\native\directxtex_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\directxtex_desktop_win10.2025.7.10.1\build\native\directxtex_desktop_win10.targets'))" />
+  </Target>
 </Project>

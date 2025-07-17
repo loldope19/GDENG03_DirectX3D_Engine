@@ -11,6 +11,7 @@ namespace dx3d
 	public:
 		Plane(const GraphicsResourceDesc& gDesc);
 
+		void onUpdate(float dt) override;
 		void render(GraphicsEngine* engine) override;
 
 	private:

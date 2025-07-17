@@ -9,6 +9,7 @@ namespace dx3d
     public:
         TexturedCube(const GraphicsResourceDesc& desc, const std::wstring& texturePath);
 
+        void onUpdate(float dt) override;
         void render(GraphicsEngine* engine) override;
 
     private:

@@ -78,9 +78,10 @@ namespace dx3d
 		DX3DGraphicsLogThrowOnFail(m_device.CreateInputLayout(layoutDesc, 2, m_vertexShader->getByteCode().data(), m_vertexShader->getByteCode().size(), &m_inputLayout), "Failed to create cube input layout");
 
 	}
-	
-	void Cube::update(float dt)
+
+	void Cube::onUpdate(float dt)
 	{
+		GameObject::onUpdate(dt);
 	}
 
 	void Cube::render(GraphicsEngine* engine)

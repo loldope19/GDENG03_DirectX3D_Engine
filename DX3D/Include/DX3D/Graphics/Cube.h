@@ -12,7 +12,7 @@ namespace dx3d
 	public:
 		Cube(const GraphicsResourceDesc& gDesc);
 
-		void update(float dt) override;
+		void onUpdate(float dt) override;
 		void render(GraphicsEngine* engine) override;
 
 	protected:

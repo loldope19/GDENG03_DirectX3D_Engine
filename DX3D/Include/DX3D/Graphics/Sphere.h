@@ -9,7 +9,7 @@ namespace dx3d
 	public:
 		Sphere(const GraphicsResourceDesc& gDesc);
 
-		void update(float dt) override;
+		void onUpdate(float dt) override;
 		void render(GraphicsEngine* engine) override;
 
 	private:

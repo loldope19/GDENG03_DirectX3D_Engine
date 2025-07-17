@@ -106,6 +106,11 @@ namespace dx3d
 		DX3DGraphicsLogThrowOnFail(m_device.CreateInputLayout(layoutDesc, 2, m_vertexShader->getByteCode().data(), m_vertexShader->getByteCode().size(), &m_inputLayout), "Failed to create cylinder input layout");
 	}
 
+	void Cylinder::onUpdate(float dt)
+	{
+		GameObject::onUpdate(dt);
+	}
+
 	void Cylinder::render(GraphicsEngine* engine)
 	{
 		engine->updateConstantBuffer(m_worldMatrix, engine->getViewMatrix(), engine->getProjectionMatrix());
