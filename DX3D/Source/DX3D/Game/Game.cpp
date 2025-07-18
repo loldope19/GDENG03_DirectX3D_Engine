@@ -9,6 +9,7 @@
 #include <memory>
 
 // Include the new primitive headers
+#include <DX3D/Graphics/Model.h>
 #include <DX3D/Graphics/Cube.h>
 #include <DX3D/Graphics/TexturedCube.h>
 #include <DX3D/Graphics/Plane.h>
@@ -37,42 +38,31 @@ dx3d::Game::Game(const GameDesc& desc) :
 
 	m_display = std::make_unique<Display>(DisplayDesc{ {m_logger,desc.windowSize}, m_graphicsEngine->getGraphicsDevice() });
 	GraphicsResourceDesc res_desc = m_graphicsEngine->getGraphicsResourceDesc();
-	/*
-	auto myCube = std::make_unique<Cube>(res_desc);
-	myCube->setPosition({ 0, 5, 0 }); // Start it 5 meters up
-	myCube->setName("Falling Cube");
-	auto cubePhysics = myCube->addComponent<PhysicsComponent>(m_physicsSystem.get(), PhysicsComponent::BodyShape::Box, myCube->getScale());
-	cubePhysics->getRigidBody()->setLinearDamping(0.5f);
-	cubePhysics->getRigidBody()->setAngularDamping(0.5f);
-	m_graphicsEngine->addGameObject(std::move(myCube));
-
-	auto groundPlane = std::make_unique<Plane>(res_desc);
-	groundPlane->setPosition({ 0, 0, 0 });
-	groundPlane->setScale({ 20, 0.01f, 20 });
-	groundPlane->setName("Ground");
-	auto groundPhysics = groundPlane->addComponent<PhysicsComponent>
-		(m_physicsSystem.get(), PhysicsComponent::BodyShape::StaticPlane, groundPlane->getScale(), 
-		Vec3{ 0.0f, -groundPlane->getScale().y / 2.0f, 0.0f });
-	groundPhysics->getRigidBody()->setType(reactphysics3d::BodyType::STATIC);
-	reactphysics3d::Material& groundMaterial = groundPhysics->getRigidBody()->getCollider(0)->getMaterial();
-	groundMaterial.setFrictionCoefficient(0.7f);
-	m_graphicsEngine->addGameObject(std::move(groundPlane));
-
-	auto plane = std::make_unique<Plane>(res_desc);
-	plane->setColor(Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	plane->setScale(Vec3(20.0f, 20.0f, 20.0f));
-	plane->setName("Plane");
-	m_graphicsEngine->addGameObject(std::move(plane));
 	
-	auto cube = std::make_unique<Cube>(res_desc);
-	cube->setScale(Vec3(3.0f, 3.0f, 3.0f));
-	cube->setName("Cube");
-	m_graphicsEngine->addGameObject(std::move(cube));
+	auto teapot = std::make_unique<Model>(res_desc,
+		"Assets/Models/teapot.obj", 
+		L"Assets/Textures/lmao.png");
+	teapot->setName("Teapot");
+	teapot->setScale({ 0.1f, 0.1f, 0.1f });
+	teapot->setPosition({ -4.0f, 0.0f, 0.0f });
+	m_graphicsEngine->addGameObject(std::move(teapot));
 
-	auto texCube = std::make_unique<TexturedCube>(res_desc, L"Assets/Textures/lmao.png");
-	texCube->setPosition({ 0, 2, 0 });
-	m_graphicsEngine->addGameObject(std::move(texCube));
-	*/
+	// 2. Load Stanford Bunny (no texture)
+	auto bunny = std::make_unique<Model>(res_desc,
+		"Assets/Models/bunny.obj");
+	bunny->setName("Bunny");
+	bunny->setScale({ 2.0f, 2.0f, 2.0f });
+	bunny->setPosition({ 0.0f, -1.0f, 0.0f });
+	m_graphicsEngine->addGameObject(std::move(bunny));
+
+	// 3. Load Armadillo (no texture)
+	auto armadillo = std::make_unique<Model>(res_desc,
+		"Assets/Models/armadillo.obj");
+	armadillo->setName("Armadillo");
+	armadillo->setScale({ 0.1f, 0.1f, 0.1f });
+	armadillo->setPosition({ 4.0f, -1.0f, 0.0f });
+	m_graphicsEngine->addGameObject(std::move(armadillo));
+	
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

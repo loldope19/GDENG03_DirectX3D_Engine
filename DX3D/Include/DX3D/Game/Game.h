@@ -7,10 +7,10 @@
 
 namespace dx3d
 {
-	class GraphicsEngine;
 	class Logger;
 	class Display;
 	class PhysicsSystem;
+	class GraphicsEngine;
 
 	class Game final : public Base
 	{

@@ -4,11 +4,13 @@
 #include <DX3D/Game/Camera.h>
 #include <DX3D/Graphics/GraphicsResource.h>
 #include <DX3D/ECS/PhysicsSystem.h> 
+#include <DX3D/Game/Game.h>
 #include <IMGUI/imgui.h> 
 #include <memory>
 #include <vector>
 #include <d3d11.h>
 #include <wrl.h>
+#include <DX3D/Math/Vec4.h>
 
 namespace dx3d
 {
@@ -17,7 +19,6 @@ namespace dx3d
 	class GraphicsDevice;
 	class GameObject;
 	class GraphicsPipelineState;
-	class Game;
 
 	class GraphicsEngine final : public Base
 	{
@@ -39,6 +40,7 @@ namespace dx3d
 		Matrix4x4 getProjectionMatrix() const;
 
 		void updateConstantBuffer(const Matrix4x4& world, const Matrix4x4& view, const Matrix4x4& projection);
+		void updateMaterialConstantBuffer(const Vec4& color, bool useOverride);
 		void recreateSceneResources(UINT width, UINT height);
 
 		ID3D11RasterizerState* getRasterizerStateCullNone() { return m_rasterizerStateCullNone.Get(); }

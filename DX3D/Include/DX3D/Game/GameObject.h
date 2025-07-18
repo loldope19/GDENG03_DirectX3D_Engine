@@ -1,4 +1,5 @@
 #pragma once
+#include <DX3D/Math/Vec2.h>
 #include <DX3D/Math/Vec3.h>
 #include <DX3D/Math/Vec4.h>
 #include <DX3D/Math/Matrix4x4.h>

@@ -6,16 +6,16 @@
 #include <DX3D/Graphics/GraphicsLogUtils.h>
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/InputManager.h>
-#include <DX3D/Game/Game.h>
 #include <DX3D/Core/EngineTime.h>
 #include <DX3D/ECS/PhysicsComponent.h>
-
+#include <DX3D/Game/Game.h>
 #include <DX3D/Graphics/Cube.h>
 #include <DX3D/Graphics/TexturedCube.h>
 #include <DX3D/Graphics/Plane.h>
 #include <DX3D/Graphics/Sphere.h>
 #include <DX3D/Graphics/Capsule.h>
 #include <DX3D/Graphics/Cylinder.h>
+#include <DX3D/Graphics/Model.h>
 
 #include <IMGUI/imgui.h>
 #include <IMGUI/imgui_impl_win32.h>
@@ -211,6 +211,21 @@ namespace dx3d
 		dataPtr->projection = Matrix4x4::transpose(projection);
 
 		context->Unmap(m_constantBuffer.Get(), 0);
+	}
+
+	void GraphicsEngine::updateMaterialConstantBuffer(const Vec4& color, bool useOverride)
+	{
+		D3D11_MAPPED_SUBRESOURCE mappedRes;
+		auto context = m_deviceContext->m_context.Get();
+
+		DX3DGraphicsLogThrowOnFail(context->Map(m_materialConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes), "Failed to map material constant buffer.");
+
+		MaterialConstantBuffer* matData = static_cast<MaterialConstantBuffer*>(mappedRes.pData);
+
+		matData->color = color;
+		matData->overrideColor = useOverride;
+
+		context->Unmap(m_materialConstantBuffer.Get(), 0);
 	}
 
 	void GraphicsEngine::recreateSceneResources(UINT width, UINT height)

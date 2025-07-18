@@ -75,6 +75,7 @@
     <ClCompile Include="DX3D\Source\DX3D\ECS\PhysicsSystem.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\GameObject.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\ECS\PhysicsComponent.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
@@ -130,6 +131,8 @@
     <ClInclude Include="DX3D\Include\DX3D\ECS\BaseComponentSystem.h" />
     <ClInclude Include="DX3D\Include\DX3D\ECS\PhysicsSystem.h" />
     <ClInclude Include="DX3D\Include\DX3D\ECS\PhysicsComponent.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Graphics\Model.h" />
+    <ClInclude Include="DX3D\Vendor\tinyobjloader\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DX3D\Vendor\IMGUI\imgui.ini" />

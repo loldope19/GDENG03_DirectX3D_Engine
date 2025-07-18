@@ -169,6 +169,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Game\Win32\Win32Game.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Model.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Plane.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Shader.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Sphere.cpp" />
@@ -204,6 +205,7 @@
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Capsule.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Cube.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Cylinder.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Graphics\Model.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Plane.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Shader.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Sphere.h" />
@@ -242,6 +244,7 @@
     <ClInclude Include="DX3D\Vendor\IMGUI\imstb_rectpack.h" />
     <ClInclude Include="DX3D\Vendor\IMGUI\imstb_textedit.h" />
     <ClInclude Include="DX3D\Vendor\IMGUI\imstb_truetype.h" />
+    <ClInclude Include="DX3D\Vendor\tinyobjloader\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DX3D\Vendor\IMGUI\imgui.ini" />
