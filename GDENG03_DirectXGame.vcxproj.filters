@@ -76,6 +76,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Game\GameObject.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\ECS\PhysicsComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Model.cpp" />
+    <ClCompile Include="Game\SceneSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
@@ -133,6 +134,9 @@
     <ClInclude Include="DX3D\Include\DX3D\ECS\PhysicsComponent.h" />
     <ClInclude Include="DX3D\Include\DX3D\Graphics\Model.h" />
     <ClInclude Include="DX3D\Vendor\tinyobjloader\tiny_obj_loader.h" />
+    <ClInclude Include="Game\SceneSerializer.h" />
+    <ClInclude Include="DX3D\Vendor\nlohmann\json.hpp" />
+    <ClInclude Include="DX3D\Vendor\nlohmann\json_fwd.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DX3D\Vendor\IMGUI\imgui.ini" />

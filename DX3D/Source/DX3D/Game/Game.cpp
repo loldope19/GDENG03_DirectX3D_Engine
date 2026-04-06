@@ -39,15 +39,15 @@ dx3d::Game::Game(const GameDesc& desc) :
 	m_display = std::make_unique<Display>(DisplayDesc{ {m_logger,desc.windowSize}, m_graphicsEngine->getGraphicsDevice() });
 	GraphicsResourceDesc res_desc = m_graphicsEngine->getGraphicsResourceDesc();
 	
+	/*
 	auto teapot = std::make_unique<Model>(res_desc,
 		"Assets/Models/teapot.obj", 
-		L"Assets/Textures/lmao.png");
+		L"Assets/Textures/brick.png");
 	teapot->setName("Teapot");
 	teapot->setScale({ 0.1f, 0.1f, 0.1f });
 	teapot->setPosition({ -4.0f, 0.0f, 0.0f });
 	m_graphicsEngine->addGameObject(std::move(teapot));
 
-	// 2. Load Stanford Bunny (no texture)
 	auto bunny = std::make_unique<Model>(res_desc,
 		"Assets/Models/bunny.obj");
 	bunny->setName("Bunny");
@@ -55,14 +55,13 @@ dx3d::Game::Game(const GameDesc& desc) :
 	bunny->setPosition({ 0.0f, -1.0f, 0.0f });
 	m_graphicsEngine->addGameObject(std::move(bunny));
 
-	// 3. Load Armadillo (no texture)
 	auto armadillo = std::make_unique<Model>(res_desc,
 		"Assets/Models/armadillo.obj");
 	armadillo->setName("Armadillo");
 	armadillo->setScale({ 0.1f, 0.1f, 0.1f });
 	armadillo->setPosition({ 4.0f, -1.0f, 0.0f });
 	m_graphicsEngine->addGameObject(std::move(armadillo));
-	
+	*/
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

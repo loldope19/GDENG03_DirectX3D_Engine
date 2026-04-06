@@ -31,6 +31,8 @@ namespace dx3d
 		void pause();
 		void stop();
 		EngineState getEngineState() const;
+		GraphicsEngine* getGraphicsEngine() const { return m_graphicsEngine.get(); }
+		PhysicsSystem* getPhysicsSystem() const { return m_physicsSystem.get(); }
 
 	private:
 		void onUpdate(float dt);

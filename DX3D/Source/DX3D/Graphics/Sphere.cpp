@@ -23,7 +23,7 @@ namespace dx3d
 		// --- Sphere Generation Logic ---
 		int latitudeBands = 30;
 		int longitudeBands = 30;
-		float radius = 1.0f;
+		float radius = 0.5f;
 
 		for (int lat = 0; lat <= latitudeBands; ++lat)
 		{
@@ -84,11 +84,17 @@ namespace dx3d
 
 		Shader::ShaderDesc vsDesc = { { m_logger, m_graphicsDevice, m_device, m_factory }, Shader::Type::Vertex, "main", "vs_5_0" };
 		m_vertexShader = std::make_unique<Shader>(vsDesc);
-		m_vertexShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/3DVertexShader.hlsl");
+		if (!m_vertexShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/3DVertexShader.hlsl"))
+		{
+			DX3DLogThrowError("Failed to load/compile vertex shader for sphere.");
+		}
 
 		Shader::ShaderDesc psDesc = { { m_logger, m_graphicsDevice, m_device, m_factory }, Shader::Type::Pixel, "main", "ps_5_0" };
 		m_pixelShader = std::make_unique<Shader>(psDesc);
-		m_pixelShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/PixelShader.hlsl");
+		if (!m_pixelShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/PixelShader.hlsl"))
+		{
+			DX3DLogThrowError("Failed to load/compile pixel shader for Sphere.");
+		}
 
 		D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },

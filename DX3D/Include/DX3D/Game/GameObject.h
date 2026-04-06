@@ -59,6 +59,8 @@ namespace dx3d
             return nullptr;
         }
 
+        virtual const char* getPrimitiveType() const { return "GameObject"; }
+
 
         // --- Transform and Color Getters/Setters ---
         void setColor(const Vec3& color) { m_color = { color.x, color.y, color.z, 1.0f }; m_overrideColor = true; }
@@ -112,5 +114,6 @@ namespace dx3d
         bool m_overrideColor = false;
 
         friend class GraphicsEngine;
+        friend class SceneSerializer;
     };
 }

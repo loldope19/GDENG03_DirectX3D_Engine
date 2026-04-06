@@ -63,13 +63,19 @@ namespace dx3d
 		indexInitData.pSysMem = indices.data();
 		DX3DGraphicsLogThrowOnFail(m_device.CreateBuffer(&indexBufferDesc, &indexInitData, &m_indexBuffer), "Failed to create cube index buffer");
 
-		Shader::ShaderDesc vertexShaderDesc = { { m_logger, m_graphicsDevice, m_device, m_factory }, Shader::Type::Vertex, "main", "vs_5_0" };
-		m_vertexShader = std::make_unique<Shader>(vertexShaderDesc);
-		m_vertexShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/3DVertexShader.hlsl");
+		Shader::ShaderDesc vsDesc = { { m_logger, m_graphicsDevice, m_device, m_factory }, Shader::Type::Vertex, "main", "vs_5_0" };
+		m_vertexShader = std::make_unique<Shader>(vsDesc);
+		if (!m_vertexShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/3DVertexShader.hlsl"))
+		{
+			DX3DLogThrowError("Failed to load/compile vertex shader for Cube.");
+		}
 
-		Shader::ShaderDesc pixelShaderDesc = { { m_logger, m_graphicsDevice, m_device, m_factory }, Shader::Type::Pixel, "main", "ps_5_0" };
-		m_pixelShader = std::make_unique<Shader>(pixelShaderDesc);
-		m_pixelShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/PixelShader.hlsl");
+		Shader::ShaderDesc psDesc = { { m_logger, m_graphicsDevice, m_device, m_factory }, Shader::Type::Pixel, "main", "ps_5_0" };
+		m_pixelShader = std::make_unique<Shader>(psDesc);
+		if (!m_pixelShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/PixelShader.hlsl"))
+		{
+			DX3DLogThrowError("Failed to load/compile pixel shader for Cube.");
+		}
 
 		D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },

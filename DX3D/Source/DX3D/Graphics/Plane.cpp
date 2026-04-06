@@ -21,10 +21,10 @@ namespace dx3d
 		Vec4 color = { 0.4f, 0.4f, 0.4f, 1.0f }; // A default grey color
 
 		std::vector<PlaneVertex> vertices = {
-			{-0.5f, 0.0f,  0.5f, color.x, color.y, color.z, color.w},
-			{ 0.5f, 0.0f,  0.5f, color.x, color.y, color.z, color.w},
-			{ 0.5f, 0.0f, -0.5f, color.x, color.y, color.z, color.w},
-			{-0.5f, 0.0f, -0.5f, color.x, color.y, color.z, color.w}
+			{-5.0f, 0.0f,  5.0f, color.x, color.y, color.z, color.w},
+			{ 5.0f, 0.0f,  5.0f, color.x, color.y, color.z, color.w},
+			{ 5.0f, 0.0f, -5.0f, color.x, color.y, color.z, color.w},
+			{-5.0f, 0.0f, -5.0f, color.x, color.y, color.z, color.w}
 		};
 
 		std::vector<UINT> indices = { 0, 1, 2, 0, 2, 3 };
@@ -47,11 +47,17 @@ namespace dx3d
 
 		Shader::ShaderDesc vsDesc = { { m_logger, m_graphicsDevice, m_device, m_factory }, Shader::Type::Vertex, "main", "vs_5_0" };
 		m_vertexShader = std::make_unique<Shader>(vsDesc);
-		m_vertexShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/3DVertexShader.hlsl");
+		if (!m_vertexShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/3DVertexShader.hlsl"))
+		{
+			DX3DLogThrowError("Failed to load/compile vertex shader for Plane.");
+		}
 
 		Shader::ShaderDesc psDesc = { { m_logger, m_graphicsDevice, m_device, m_factory }, Shader::Type::Pixel, "main", "ps_5_0" };
 		m_pixelShader = std::make_unique<Shader>(psDesc);
-		m_pixelShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/PixelShader.hlsl");
+		if (!m_pixelShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/PixelShader.hlsl"))
+		{
+			DX3DLogThrowError("Failed to load/compile pixel shader for Plane.");
+		}
 
 		D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },

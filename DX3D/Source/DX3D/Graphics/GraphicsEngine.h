@@ -14,6 +14,7 @@
 
 namespace dx3d
 {
+	class SceneSerializer;
 	class SwapChain;
 	class DeviceContext;
 	class GraphicsDevice;
@@ -34,6 +35,7 @@ namespace dx3d
 		void addGameObject(std::unique_ptr<GameObject> go);
 		void selectObject(size_t index);
 		void removeGameObject(GameObject* object);
+		void clearScene();
 
 		DeviceContextPtr getDeviceContext() const { return m_deviceContext; }
 		Matrix4x4 getViewMatrix() const;
@@ -58,8 +60,12 @@ namespace dx3d
 		void spawnPlaceholderCubeClump();
 		void spawnPlaceholderPlane();
 
+		const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const { return m_gameObjects; }
+		Game* getGame() const { return m_game; }
+
 	private:
 		friend class GameObject;
+		friend class SceneSerializer;
 
 		GameObject* m_selectedObject = nullptr;
 
@@ -68,6 +74,7 @@ namespace dx3d
 
 		std::unique_ptr<Camera> m_camera;
 		std::vector<std::unique_ptr<GameObject>> m_gameObjects;
+		std::unique_ptr<SceneSerializer> m_sceneSerializer;
 
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_constantBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_materialConstantBuffer;

@@ -13,6 +13,7 @@ namespace dx3d
 
 		void onUpdate(float dt) override;
 		void render(GraphicsEngine* engine) override;
+		virtual const char* getPrimitiveType() const override { return "Plane"; }
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer;

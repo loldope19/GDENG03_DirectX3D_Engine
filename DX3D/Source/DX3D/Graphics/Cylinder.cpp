@@ -22,7 +22,7 @@ namespace dx3d
 
 		const int segments = 30;
 		const float height = 2.0f;
-		const float radius = 1.0f;
+		const float radius = 0.5f;
 		const float halfHeight = height / 2.0f;
 
 		// --- Create Rings (Top and Bottom) ---
@@ -93,11 +93,17 @@ namespace dx3d
 
 		Shader::ShaderDesc vsDesc = { { m_logger, m_graphicsDevice, m_device, m_factory }, Shader::Type::Vertex, "main", "vs_5_0" };
 		m_vertexShader = std::make_unique<Shader>(vsDesc);
-		m_vertexShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/3DVertexShader.hlsl");
+		if (!m_vertexShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/3DVertexShader.hlsl"))
+		{
+			DX3DLogThrowError("Failed to load/compile vertex shader for Cylinder.");
+		}
 
 		Shader::ShaderDesc psDesc = { { m_logger, m_graphicsDevice, m_device, m_factory }, Shader::Type::Pixel, "main", "ps_5_0" };
 		m_pixelShader = std::make_unique<Shader>(psDesc);
-		m_pixelShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/PixelShader.hlsl");
+		if (!m_pixelShader->loadFromFile("DX3D/Source/DX3D/Graphics/Shaders/PixelShader.hlsl"))
+		{
+			DX3DLogThrowError("Failed to load/compile pixel shader for Cylinder.");
+		}
 
 		D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },

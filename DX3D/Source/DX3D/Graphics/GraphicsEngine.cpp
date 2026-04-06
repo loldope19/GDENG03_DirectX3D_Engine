@@ -1,4 +1,5 @@
 #include <DX3D/Graphics/GraphicsEngine.h>
+#include <../../Game/SceneSerializer.h>
 #include <DX3D/Graphics/GraphicsDevice.h>
 #include <DX3D/Graphics/DeviceContext.h>
 #include <DX3D/Graphics/SwapChain.h>
@@ -23,6 +24,8 @@
 #include <IMGUI/imgui_internal.h>
 
 #include <reactphysics3d/reactphysics3d.h>
+#include <commdlg.h>
+#include <Windows.h>
 
 namespace dx3d
 {
@@ -43,6 +46,7 @@ namespace dx3d
 	GraphicsEngine::GraphicsEngine(const GraphicsEngineDesc& desc, PhysicsSystem* physicsSystem, Game* game)
 		: Base(desc.base), m_physicsSystem(physicsSystem), m_game(game)
 	{
+		m_sceneSerializer = std::make_unique<SceneSerializer>(this);
 		m_graphicsDevice = std::make_shared<GraphicsDevice>(GraphicsDeviceDesc{ m_logger });
 		m_deviceContext = m_graphicsDevice->createDeviceContext();
 
@@ -199,6 +203,12 @@ namespace dx3d
 			m_gameObjects.end());
 	}
 
+	void GraphicsEngine::clearScene()
+	{
+		m_selectedObject = nullptr;
+		m_gameObjects.clear();
+	}
+
 	void GraphicsEngine::updateConstantBuffer(const Matrix4x4& world, const Matrix4x4& view, const Matrix4x4& projection)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -335,10 +345,47 @@ namespace dx3d
 		{
 			if (ImGui::BeginMenu("File"))
 			{
+				if (ImGui::MenuItem("Save Level"))
+				{
+					OPENFILENAMEA ofn;
+					char szFile[260] = { 0 };
+					ZeroMemory(&ofn, sizeof(ofn));
+					ofn.lStructSize = sizeof(ofn);
+					ofn.hwndOwner = NULL;
+					ofn.lpstrFile = szFile;
+					ofn.nMaxFile = sizeof(szFile);
+					ofn.lpstrFilter = "Level Files (*.level)\0*.level\0All Files (*.*)\0*.*\0";
+					ofn.nFilterIndex = 1;
+					ofn.lpstrDefExt = "level";
+					ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR;
+
+					if (GetSaveFileNameA(&ofn) == TRUE)
+					{
+						m_sceneSerializer->serialize(ofn.lpstrFile);
+					}
+				}
+				if (ImGui::MenuItem("Load Level"))
+				{
+					OPENFILENAMEA ofn;
+					char szFile[260] = { 0 };
+					ZeroMemory(&ofn, sizeof(ofn));
+					ofn.lStructSize = sizeof(ofn);
+					ofn.hwndOwner = NULL;
+					ofn.lpstrFile = szFile;
+					ofn.nMaxFile = sizeof(szFile);
+					ofn.lpstrFilter = "Level Files (*.level)\0*.level\0All Files (*.*)\0*.*\0";
+					ofn.nFilterIndex = 1;
+					ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR;
+
+					if (GetOpenFileNameA(&ofn) == TRUE)
+					{
+						m_sceneSerializer->deserialize(ofn.lpstrFile);
+					}
+				}
+				ImGui::Separator();
 				if (ImGui::MenuItem("Exit"))
 				{
-					// For now, we can just log it.
-					DX3DLogInfo("Exit menu item clicked.");
+					m_game->stop();
 				}
 				ImGui::EndMenu();
 			}
@@ -629,9 +676,10 @@ namespace dx3d
 	{
 		auto res_desc = getGraphicsResourceDesc();
 
-		for (int i = 0; i < 20; ++i)
+		for (int i = 0; i < 50; ++i)
 		{
 			auto cube = std::make_unique<Cube>(res_desc);
+			cube->setScale(Vec3(0.5f, 0.5f, 0.5f));
 
 			float offsetX = static_cast<float>(rand() % 100) / 200.0f;
 			float offsetY = static_cast<float>(rand() % 100) / 200.0f;

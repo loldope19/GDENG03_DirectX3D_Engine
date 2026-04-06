@@ -17,7 +17,7 @@ namespace dx3d
         auto input = InputManager::getInstance();
 
         Vec3 newPos = m_position;
-        float movementSpeed = 10.0f * dt;
+        float movementSpeed = 5.0f * dt;
         float rotationSpeed = 0.5f * dt;
                 
         if (input->isKeyDown('W')) { newPos += m_forward * movementSpeed; }
